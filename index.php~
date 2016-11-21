@@ -12,7 +12,8 @@ Cabeçalho aqui
 
 <div id="login">
 <?php
-include("valida.php");
+//include("valida.php");
+echo 'Bem vindo visitante';
 ?>
 </div>
 

@@ -7,9 +7,9 @@
 </head>
 <body>
 
-<h1>Login de usuário</h1>
-
-
+<div id="header">
+Cabeçalho aqui
+</div>
 <div id="login">
 <?php
 //include("valida.php");
@@ -18,6 +18,7 @@ echo 'Bem vindo visitante';
 </div>
 
 
+<h3>Login de usuário</h3>
 <?php
 session_start();
 if(isset($_SESSION['user_login'])) {
@@ -26,53 +27,66 @@ echo "<a href='logout.php'>Sair</a>";
 exit();
 } 
 ?>
-Clique <a href="cadastrar.php">aqui</a> para se cadastrar e ter acesso ao sistema.
 
-<form action="login.php" method="post">
-Email:
-<input name="txt_usuario" type="text" id="entravalor"  size="13" />
-Senha:
-<input name="txt_senha" type="password" id="entravalor"  size="13" maxlength="13"  />
-<input type="submit" value="Login"/>
+<div id="content">
+
+<form action="login.php" method="post" name="form1">
+<p><label>Email</label></p>
+<p>
+<input name="txt_usuario" type="text" id="entravalor"  size="13" style="width: 219px" required/></p>
+<p><label>Senha</label></p>
+<p>
+<input name="txt_senha" type="password" id="entravalor"  size="13" maxlength="13" style="width: 218px"  required/></p>
+<p><input type="submit" value="login"/></p>
 </form>
 
-<?php
+Clique <a href="cadastrar.php">aqui</a> para se cadastrar e ter acesso ao sistema.
 
-echo "</ br> Faça o seu login para ter acesso ao sistema";
+<?php
 
 	include "conecta.php";
 	
 	if (isset($_POST['txt_usuario'])) {
-		$usuario = $_POST['txt_usuario']; 
-	} else {
-		exit;
-	}
-	if (isset($_POST['txt_senha'])) $senha = md5($_POST['txt_senha']);
+		$usuario = trim($_POST['txt_usuario']); 
+		$senha = trim($_POST['txt_senha']);
+		
+		$senha = md5($senha);
 	
 
-		$sql='select * from tbUsuario where tbUsuarioLogin="'.$usuario.'" and tbUsuarioSenha="'.$senha.'"';	
-		$rs=mysql_query($sql, $conexao) or die ("Usuário ou senha incorreta");	
+		$Sql="SELECT * FROM `tbuser` WHERE `tbEmail` = '".$usuario."' AND `tbPassword` = '".$senha."'";
+		//$Sql = "SELECT * FROM `tbuser` WHERE `tbEmail` = 'admin@admin' AND `tbPassword` = '21232f297a57a5a743894a0e4a801fc3'";
+		echo $Sql;
+		$rs=mysql_query($Sql, $conexao) or die ("<script language='javascript' type='text/javascript'> alert('Usuário ou senha incorreta'); window.location.href='login.php'; </script>");
+		
+		echo $rs;
 		
 		while($linha = mysql_fetch_array($rs))
 			{
-			$idtbUsuario=$linha["idtbUsuario"];
-			$nome=$linha["tbUsuarioNome"];
-			$nivel=$linha["tbPermissao_idtbPermissao"];
+			$user_id=$linha["idtbUser"];
+			$user_name=$linha["tbNome"];
+			echo $user_name;
+			$user_type=$linha["tbUserType_idtbUserType"];
 			}
 			
-			echo $nome;
+			echo $user_name;
 			
-			if ($nome!=false) {		
-			$_SESSION['user_login'] = $nome;
-			$_SESSION['cod_usuario']=$idtbUsuario;
-			$_SESSION['permissao']=$nivel;
+			if ($rs!=false) {		
+			$_SESSION['user_login'] = $user_name;
+			$_SESSION['user_id']=$user_id;
+			$_SESSION['user_type']=$user_type;
 			mysql_close($conexao);
-			header('Location:index.php');
+			header('Location:index2.php');
 			
 			}
+	}
 			
 ?>
-<body>
+</div>
+
+<div id="footer">
+Desenvolvimento: Ademir Marques Junior - 2016
+</div>
+
 
 </body>
 </html>

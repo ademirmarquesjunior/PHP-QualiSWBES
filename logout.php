@@ -1,8 +1,12 @@
 <!DOCTYPE html>
-<html xmlns="http://www.w3.org/1999/xhtml">
+<html>
 <head>
-<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-<title></title>
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rel="stylesheet" href="" type="text/css" media="screen" />
+<title>Sair</title>
+
+
+
 </head>
 
 <body>
@@ -10,12 +14,11 @@
 <?php
 session_start();
 if(isset($_SESSION['user_login'])) {
-echo "Usuário '".$_SESSION['user_login']."' ";
+//echo "Usuário '".$_SESSION['user_login']."' ";
 session_destroy();
-echo "Desconectado com sucesso";
+echo "<script language='javascript' type='text/javascript'> alert('Você saiu!'); window.location.href='login.php'; </script>";
 } 
 ?>
-<a href='login.php'>login</a>
 
 </body>
 </html>

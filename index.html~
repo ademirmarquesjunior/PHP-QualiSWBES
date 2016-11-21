@@ -10,12 +10,6 @@
 Cabeçalho aqui
 </header>
 
-<div id="login">
-<?php
-include("valida.php");
-?>
-</div>
-
 
 <div id="content">
 Algum conteúdo

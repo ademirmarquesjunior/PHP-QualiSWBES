@@ -5,5 +5,5 @@ include("valida.php");
 </div>
 
 <div id="conteudo">
-Vocï¿½ nï¿½o tem permissï¿½o para acessar a pï¿½gina.
+Você não tem permissão para acessar a página.
 </div>
