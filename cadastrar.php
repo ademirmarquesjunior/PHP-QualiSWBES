@@ -1,26 +1,27 @@
 <!DOCTYPE html>
+
 <head>
-<meta http-equiv="content-type" content="text/html; charset=utf-8" />
-<link rel="stylesheet" href="" type="text/css" media="screen" />
+<meta content="text/html; charset=utf-8" http-equiv="content-type" />
+<!-- <link rel="stylesheet" href="estilo.css" type="text/css" media="screen" /> -->
+<link href="css/bootstrap.min.css" rel="stylesheet">
+<link href="css/style.css" rel="stylesheet">
 <title>Cadastrar Usuário</title>
-
-
-
 </head>
+
 <body>
 
-<div id="login">
-<?php
+<div class="container-fluid">
+	<div class="jumbotron">
+		<h2>Modelo de Avaliação de Qualidade dos Sistemas Educacionais
+baseados em Web Semântica (SEWebS) </h2>
+	</div>
+	<div id="login">
+		<?php
 //include("valida.php");
 echo 'Bem vindo visitante';
-?>
-</div>
-
-
-<div id="conteudo">
-
-<h3>Cadastre-se:</h3>
-<?php 
+?></div>
+	<h3>Cadastre-se:</h3>
+	<?php 
 	session_start();
 // isset verifica se a sessão já existe
 /*
@@ -58,11 +59,11 @@ if (isset($_POST['txt_nome'])) {
 
 } else {
 	
-	echo '<form action="cadastrar.php" method="post" name="form1">';
-    echo '<p>Nome Completo: </p> <p><input maxlength="60" name="txt_nome" id="entravalor2" size="50" required /></p>';
-    echo '<p>Email para login:</p> <p><input name="txt_email" id="entravalor3" size="40" type="email" required /></p>';
+	echo '<form action="cadastrar.php" method="post" name="form1" class="form-group">';
+    echo '<p>Nome Completo: </p> <p><input maxlength="60" name="txt_nome" id="entravalor2" size="50" class="form-control" required /></p>';
+    echo '<p>Email para login:</p> <p><input name="txt_email" id="entravalor3" size="40" type="email" class="form-control" required /></p>';
 	
-	echo '<p>Escolha um tipo de usuário</p> <p><select name="sel_usuario" id="usuario">';
+	echo '<p>Escolha um tipo de usuário</p> <p><select name="sel_usuario" id="usuario" class="form-control">';
 	//echo '<option value=""></option>';
 	$Sql = "SELECT * FROM tbusertype";
 	$rs = mysql_query($Sql, $conexao);
@@ -71,15 +72,13 @@ if (isset($_POST['txt_nome'])) {
 		echo "<option value=".$linha['idtbUserType'].">".$linha['tbUserTypeDescripton']."</option>"; 
 	}
 	echo 	'</select></p>';
-    echo '<p>Senha:</p> <p><input name="txt_senha1" id="entravalor4" size="12" type="password" required /></p>';
-    echo '<p>Repita a senha:</p> <p><input name="txt_senha2" id="entravalor" size="12" maxlength="13" type="password" required /></p>';
-    echo '<p><input value="Limpar" type="reset" /><input value="Enviar" type="submit" onclick="return validar()"></p>';
+    echo '<p>Senha:</p> <p><input name="txt_senha1" id="entravalor4" size="12" type="password" class="form-control" required /></p>';
+    echo '<p>Repita a senha:</p> <p><input name="txt_senha2" id="entravalor" size="12" maxlength="13" type="password" class="form-control" required /></p>';
+    echo '<p><input value="Limpar" type="reset" class="btn btn-default"><input value="Enviar" type="submit" class="btn btn-default" onclick="return validar()"></p>';
 	echo '</form>';
 }
 ?>
-
-
-<script language="javascript" type="text/javascript">
+	<script language="javascript" type="text/javascript">
 function validar() {
 var senha1 = document.form1.txt_senha1.value;
 var senha2 = document.form1.txt_senha2.value;
@@ -94,5 +93,10 @@ return false;
 
 }
 </script>
+	<div id="footer" class="well well-sm">
+		Desenvolvimento: Ademir Marques Junior - 2016 </div>
+</div>
+
 </body>
+
 </html>

@@ -1,25 +1,28 @@
 <!DOCTYPE html>
 <html>
+
 <head>
-<meta http-equiv="content-type" content="text/html; charset=utf-8" />
-<link rel="stylesheet" href="estilo.css" type="text/css" media="screen" />
+<meta content="text/html; charset=utf-8" http-equiv="content-type" />
+<!-- <link rel="stylesheet" href="estilo.css" type="text/css" media="screen" /> -->
+<link href="css/bootstrap.min.css" rel="stylesheet">
+<link href="css/style.css" rel="stylesheet">
 <title></title>
 </head>
+
 <body>
 
-<div id="header">
-Cabeçalho aqui
-</div>
-<div id="login">
-<?php
+<div class="container-fluid">
+	<div class="jumbotron">
+		<h2>Modelo de Avaliação de Qualidade dos Sistemas Educacionais
+baseados em Web Semântica (SEWebS) </h2>
+	</div>
+	<div id="login">
+		<?php
 //include("valida.php");
 echo 'Bem vindo visitante';
-?>
-</div>
-
-
-<h3>Login de usuário</h3>
-<?php
+?></div>
+	<h3>Login de usuário</h3>
+	<?php
 session_start();
 if(isset($_SESSION['user_login'])) {
 echo "Bem vindo '".$_SESSION['user_login']."' ";
@@ -27,22 +30,17 @@ echo "<a href='logout.php'>Sair</a>";
 exit();
 } 
 ?>
-
-<div id="content">
-
-<form action="login.php" method="post" name="form1">
-<p><label>Email</label></p>
-<p>
-<input name="txt_usuario" type="text" id="entravalor"  size="13" style="width: 219px" required/></p>
-<p><label>Senha</label></p>
-<p>
-<input name="txt_senha" type="password" id="entravalor"  size="13" maxlength="13" style="width: 218px"  required/></p>
-<p><input type="submit" value="login"/></p>
-</form>
-
-Clique <a href="cadastrar.php">aqui</a> para se cadastrar e ter acesso ao sistema.
-
-<?php
+	<form action="login.php" class="form-group" method="post" name="form1">
+		<p><label>Email</label></p>
+		<p>
+		<input id="entravalor" class="form-control" name="txt_usuario" required="" type="text" /></p>
+		<p><label>Senha</label></p>
+		<p>
+		<input id="entravalor" class="form-control" name="txt_senha" required="" type="password" /></p>
+		<p><input class="btn btn-default" type="submit" value="login"></p>
+	</form>
+	Clique <a href="cadastrar.php">aqui</a> para se cadastrar e ter acesso ao sistema.
+	<?php
 
 	include "conecta.php";
 	
@@ -81,12 +79,10 @@ Clique <a href="cadastrar.php">aqui</a> para se cadastrar e ter acesso ao sistem
 	}
 			
 ?>
+	<div id="footer" class="well well-sm">
+		Desenvolvimento: Ademir Marques Junior - 2016 </div>
 </div>
-
-<div id="footer">
-Desenvolvimento: Ademir Marques Junior - 2016
-</div>
-
 
 </body>
+
 </html>

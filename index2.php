@@ -1,26 +1,26 @@
 <!DOCTYPE html>
 <html>
+
 <head>
-<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-<link rel="stylesheet" href="estilo.css" type="text/css" media="screen" />
+<meta content="text/html; charset=utf-8" http-equiv="Content-Type" />
+<!-- <link rel="stylesheet" href="estilo.css" type="text/css" media="screen" /> -->
+<link href="css/bootstrap.min.css" rel="stylesheet">
+<link href="css/style.css" rel="stylesheet">
 <title>Cabeçalho aqui</title>
 </head>
+
 <body>
 
-<div id="header">
-Cabeçalho aqui
-</div>
-
-<div id="login">
-<?php
+<div class="container-fluid">
+	<div class="jumbotron">
+		<h2>Modelo de Avaliação de Qualidade dos Sistemas Educacionais
+baseados em Web Semântica (SEWebS) </h2>
+	</div>
+	<div id="login" class="well well-sm">
+		<?php
 include("valida.php");
-?>
-</div>
-
-
-<div id="content">
-
-<?php
+?></div>
+	<?php
 
 include "conecta.php";
 
@@ -29,7 +29,7 @@ $type = $_SESSION['user_type'];
 
 if (isset($_POST['txt_aplic'])) {
 	$aplic = $_POST['txt_aplic'];
-	$aplic_desc = $_POST['txt_aplic_desc'];
+	//$aplic_desc = $_POST['txt_aplic_desc'];
 
 	$Sql = "SELECT * FROM `tbapplication` WHERE `tbApplicationName` = '".$aplic."'";
 	$rs = mysql_query($Sql, $conexao) or die ("Erro busca aplicação");
@@ -54,14 +54,14 @@ if (isset($_POST['txt_aplic'])) {
 			$rs = mysql_query($Sql, $conexao) or die ("Erro busca id aplicação");
 			$linha2 = mysql_fetch_array($rs);
 			$applic_id=$linha2["idtbApplication"];
+			$_SESSION['appic_id'] = $applic_id;
 		}	
 	}
 
-	$_SESSION['appic_id'] = $applic_id;
 	
 	//inserir um novo formulário em tbform
 	$Sql = "INSERT INTO `tbform` (`idtbForm`, `tbApplication_idtbApplication`, `tbUser_idtbUser`) VALUES (NULL, '".$applic_id."', '".$user."')";
-	$rs = mysql_query($Sql, $conexao) or die ("Erro insere formulário");
+	$rs = mysql_query($Sql, $conexao) or die ("<script language='javascript' type='text/javascript'> alert('Você já avaliou uma aplicação com esse nome.'); window.location.href='index2.php'; </script>");
 
 	//obter o id do form inserido
 	if ($rs) {
@@ -83,60 +83,39 @@ if (isset($_POST['sel_aplic'])) {
 }
 
 ?>
-
-
-
-<h3>Cadastrar uma nova aplicação e iniciar avaliação</h3>
-
-<form action="index2.php" method="post" name="form1">
-<p><label>Nome da aplicação</label></p>
-<p>
-<input name="txt_aplic" type="text" id="entravalor"  size="13" style="width: 516px"  required/></p>
-<p><input type="submit" value="Iniciar avaliação"/></p>
-</form>
-
-
-
-
-
-
-	
+	<h3>Cadastrar uma nova aplicação e iniciar avaliação</h3>
+	<form action="index2.php" class="form-group" method="post" name="form1">
+		<p><label>Nome da aplicação</label></p>
+		<p>
+		<input id="entravalor" class="form-control" name="txt_aplic" required="" type="text" /></p>
+		<p>
+		<input class="btn btn-default" type="submit" value="Iniciar avaliação" /></p>
+	</form>
 	<br><hr><br>
-	<h3>Avaliar uma dessas aplicações</h3>
-	
-<form action="index2.php" method="post" name="form2">
-<p><label>Nome da aplicação</label></p>
-<p>
-<select name="sel_aplic" id="aplication"><option value="">Escolha uma das opções</option><?php $Sql = mysql_query("SELECT * FROM `tbapplication` "); while ($rr = mysql_fetch_array($Sql)) { echo "<option value=".$rr['idtbApplication'].">".$rr['tbApplicationName']."</option>"; } ?></select>
-</p>
-<p><input type="submit" value="Iniciar avaliação"/></p>
-</form>
-
-	
-<?php
+	<h3>Avalie uma dessas aplicações</h3>
+	<form action="index2.php" class="form-group" method="post" name="form2">
+		<p><label>Nome da aplicação</label></p>
+		<p><select id="aplication" class="form-control" name="sel_aplic">
+		<option value="">Escolha uma das opções</option>
+		<?php $Sql = mysql_query("SELECT * FROM `tbapplication` "); while ($rr = mysql_fetch_array($Sql)) { echo "<option value=".$rr['idtbApplication'].">".$rr['tbApplicationName']."</option>"; } ?>
+		</select> </p>
+		<p>
+		<input class="btn btn-default" type="submit" value="Iniciar avaliação" /></p>
+	</form>
+	<?php
 
 $user = $_SESSION['user_id'];
 $type = $_SESSION['user_type'];
 
 
 
-?>
-
-	
-	
-	
-	<br>
-	<hr>
-	<br><br>
+?><br><hr><br>
 	<h3>Minhas avaliações</h3>
-	<br>&nbsp;&nbsp;&nbsp; Obs: Abre na tela de 
-	resultados<br>
-</div>
-
-
-<div id="footer">
-Desenvolvimento: Ademir Marques Junior - 2016
+	<br>&nbsp;&nbsp;&nbsp; Obs: Abre na tela de resultados<br>
+	<div id="footer" class="well well-sm">
+		Desenvolvimento: Ademir Marques Junior - 2016 </div>
 </div>
 
 </body>
+
 </html>

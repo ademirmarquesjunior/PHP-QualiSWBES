@@ -1,28 +1,28 @@
 <!DOCTYPE html>
 <html>
+
 <head>
-<meta http-equiv="content-type" content="text/html; charset=utf-8" />
-<link rel="stylesheet" href="estilo.css" type="text/css" media="screen" />
+<meta content="text/html; charset=utf-8" http-equiv="content-type" />
+<!-- <link rel="stylesheet" href="estilo.css" type="text/css" media="screen" /> -->
+<link href="css/bootstrap.min.css" rel="stylesheet">
+<link href="css/style.css" rel="stylesheet">
 <title></title>
 </head>
+
 <body>
 
-<div id="header">
-Cabeçalho aqui
-</div>
-
-<div id="login">
-<?php
+<div class="container-fluid">
+	<div class="jumbotron">
+		<h2>Modelo de Avaliação de Qualidade dos Sistemas Educacionais
+baseados em Web Semântica (SEWebS) </h2>
+	</div>
+	<div id="login" class="well well-sm">
+		<?php
 include("valida.php");
-?>
-</div>
-
-<div id="content">
-
-<h1>Questionário</h1>
-
-<form action='form.php' method='get'>
-<?php
+?></div>
+	<h1>Questionário</h1>
+	<form action="form.php" method="get" class="form-group">
+		<?php
 include "conecta.php";
 
 
@@ -58,31 +58,23 @@ $rs = mysql_query($Sql, $conexao) or die ("Erro na pesquisa");
 			$howto=$linha["tbUserQuestionHowTo"];
 						
 						
-			echo  "<p id='question'>".$question."</p>";
-			echo  "<p id='howto'>".$howto."</p>";
-			echo    "<input type='radio' name=".$id." value='0' required/>";
-			echo    "<input type='radio' name=".$id." value='1' />";
-			echo    "<input type='radio' name=".$id." value='2' />";
-			echo    "<input type='radio' name=".$id." value='3' />";
-			echo    "<input type='radio' name=".$id." value='4' />";
-			echo    "<input type='radio' name=".$id." value='5' />";
+			echo  "<h4 id='question'>".$question."</h4>";
+			echo  "<h5 id='howto'>".$howto."</h5>";
+			echo    "<div class='radio'><label><input type='radio' name=".$id." value='0' class='optradio' required/>0</label></div>";
+			echo    "<div class='radio'><label><input type='radio' name=".$id." value='1' class='optradio' />1</label></div>";
+			echo    "<div class='radio'><label><input type='radio' name=".$id." value='2' class='optradio'  />2</label></div>";
+			echo    "<div class='radio'><label><input type='radio' name=".$id." value='3' class='optradio' />3</label></div>";
+			echo    "<div class='radio'><label><input type='radio' name=".$id." value='4' class='optradio' />4</label></div>";
+			echo    "<div class='radio'><label><input type='radio' name=".$id." value='5' class='optradio' />5</label></div>";
 			echo    "<hr>";
 
 			}
 						
-?>
-
-<input type='submit' value='Salvar'/>
-
-</form>
-
+?><input type="submit" value="Salvar" class="btn btn-default"/>
+	</form>
+	<div id="footer" class="well well-sm">
+		Desenvolvimento: Ademir Marques Junior - 2016 </div>
 </div>
-
-<div id="footer">
-Desenvolvimento: Ademir Marques Junior - 2016
-</div>
-
-
 </body>
 
 </html>
