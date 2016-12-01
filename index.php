@@ -5,7 +5,7 @@
 <!-- <link rel="stylesheet" href="estilo.css" type="text/css" media="screen" /> -->
 <link href="css/bootstrap.min.css" rel="stylesheet" />
 <link href="css/style.css" rel="stylesheet" />
-<title></title>
+<title>SEWebS</title>
 </head>
 
 <body>
@@ -70,6 +70,8 @@ echo "<a href='logout.php'>Sair</a>";
 </div>
 <div id="footer" class="well well-sm">
 	Desenvolvimento: Ademir Marques Junior - 2016 </div>
+</div>
+
 
 </body>
 

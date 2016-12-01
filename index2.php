@@ -6,7 +6,7 @@
 <!-- <link rel="stylesheet" href="estilo.css" type="text/css" media="screen" /> -->
 <link href="css/bootstrap.min.css" rel="stylesheet">
 <link href="css/style.css" rel="stylesheet">
-<title>Cabeçalho aqui</title>
+<title>SEWebS</title>
 </head>
 
 <body>
@@ -17,7 +17,7 @@
 baseados em Web Semântica (SEWebS) </h2>
 	</div>
 	<div id="login" class="well well-sm">
-		<?php
+	<?php
 include("valida.php");
 ?></div>
 	<?php

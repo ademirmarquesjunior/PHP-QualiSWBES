@@ -6,7 +6,7 @@
 <!-- <link rel="stylesheet" href="estilo.css" type="text/css" media="screen" /> -->
 <link href="css/bootstrap.min.css" rel="stylesheet">
 <link href="css/style.css" rel="stylesheet">
-<title></title>
+<title>SEWebS</title>
 </head>
 
 <body>
@@ -27,6 +27,7 @@ session_start();
 if(isset($_SESSION['user_login'])) {
 echo "Bem vindo '".$_SESSION['user_login']."' ";
 echo "<a href='logout.php'>Sair</a>";
+header('Location:index.php');
 exit();
 } 
 ?>
