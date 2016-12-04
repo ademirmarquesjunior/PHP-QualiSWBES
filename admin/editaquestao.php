@@ -38,13 +38,6 @@
             echo $_GET['id'];
             echo '<br>';
 
-            echo '<select name="sel_usuario" id="usuario">';
-            $Sql = mysql_query("SELECT * FROM `tbusertype` WHERE `idtbUserType` = " . $_GET['usertype']);
-            while ($rr = mysql_fetch_array($Sql)) {
-                echo "<option value=" . $rr['idtbUserType'] . ">" . $rr['tbUserTypeDescripton'] . "</option>";
-            }
-            echo '</select>';
-
             echo '<select name="sel_artifact" id="artifact">';
             $Sql = mysql_query("SELECT * FROM `tbArtifact` WHERE idtbArtifact = " . $_GET['artifact']);
             while ($rr = mysql_fetch_array($Sql)) {
@@ -58,6 +51,15 @@
                 echo "<option value=" . $rr['idtbCriterion'] . ">" . $rr['tbCriterionDesc'] . "</option>";
             }
             echo '</select>';
+            
+            echo '<select name="sel_subcriterion" id="subcriterion">';
+            $Sql = mysql_query("SELECT * FROM `tbsubcriterion` WHERE `idtbSubCriterion` = " . $_GET['subcriterion']);
+            while ($rr = mysql_fetch_array($Sql)) {
+                echo "<option value=" . $rr['idtbSubcriterion'] . ">" . $rr['tbSubCriterionDesc'] . "</option>";
+            }
+            echo '</select>';
+
+            
 
             echo '<br><br>';
             echo '<label>Questão</label><br>';

@@ -97,7 +97,7 @@ $rs = mysql_query($Sql, $conexao) or die ("Erro na pesquisa-user");
 			$criterion = trim($_POST['sel_criterion']);
 			$subcriterion = trim($_POST['sel_subcriterion']);
 			
-			$Sql = mysql_query("INSERT INTO `tbCriterion_has_tbSubcriterion` (`tbriterion_idtbCriterion`, `tbSubCriterion_idtbSubCriterion`) VALUES ('".$criterion."','".$subcriterion."')");
+			$Sql = mysql_query("INSERT INTO `tbsubCriterion_has_tbcriterion` (`tbCriterion_idtbCriterion`, `tbSubCriterion_idtbSubCriterion`) VALUES ('".$criterion."','".$subcriterion."')");
 
 			if (!($Sql)) {
 					echo "<script language='javascript' type='text/javascript'> alert('Erro!'); </script>";

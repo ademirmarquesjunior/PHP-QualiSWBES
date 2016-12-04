@@ -14,9 +14,11 @@
 <a href="inserequestao.php"><img src="img/images.png" height="30" alt="Adicionar nova" /></a>
 </p>
 
+<input name="txt_senha1" id="entravalor4" size="12" type="text" hidden/>
+
 Ordenar por <a href="listaquestao.php?order=1">Personagem</a>, <a href="listaquestao.php?order=2">Artefato</a>, ou <a href="listaquestao.php?order=3">Critério</a>.
 
-<table class="table-bordered" >
+<table class="table table-condensed table-hover" >
 <tr>
 <td>ID</td>
 
@@ -62,27 +64,50 @@ $rs = mysql_query($Sql, $conexao) or die ("Erro na pesquisa");
 						
 			echo  "<tr>";
 			echo    "<td>".$id."</td>";
-			echo    '<td><form method="post" action="">
-<label><input name="Checkbox1" type="checkbox" value=""/>Personagem</label>
-<label><input name="Checkbox1" type="checkbox" value=""/>Personagem</label>
-<label><input name="Checkbox1" type="checkbox" value=""/>Personagem</label>
-<label><input name="Checkbox1" type="checkbox" value=""/>Personagem</label>
-</form>
-';
-			//$Sql2 = "SELECT * FROM `tbuserType` WHERE `idtbUserType` = ".$usertype;
-			//$rs2 = mysql_query($Sql2, $conexao) or die ("Erro na pesquisa");
-			//while ($linha2 =  mysql_fetch_array($rs2)){ echo $linha2["tbUserTypeDescripton"]; }			
+			echo    '<td>';
+			echo '<form method="get" target="_blank" action="editarelacaoquestao.php">';
+			$Sql2 = "SELECT * FROM `tbusertype`";
+			$rs2 = mysql_query($Sql2, $conexao) or die ("Erro na pesquisa");
+			while ($linha2 =  mysql_fetch_array($rs2)){ 
+					
+				echo '<label><input name="Checkbox1[]" type="checkbox" value="'.$linha2["idtbUserType"].'"';
+				$Sql3 = "SELECT * FROM `tbusertype_has_tbUserquestion` WHERE `tbUserQuestion_idtbUserQuestion` = ".$id." AND `tbUserType_idtbUsertype` = ".$linha2["idtbUserType"];
+				//echo $Sql3;
+				$rs3 = mysql_query($Sql3, $conexao);
+				while ($linha3 =  mysql_fetch_array($rs3)){				
+					echo 'checked="checked" ';
+				}
+				echo '/>'.$linha2["tbUserTypeDescripton"].'</label><br>';
+				
+			}
+			echo '<input name="txt_questao" value="'.$id.'" size="12" type="text" hidden/>';	
+			echo '<button type="submit" name="submituser"><span class="glyphicon glyphicon-refresh"></span></button></form>';
 			echo "</td>";
+
+			echo    '<td>';
+			echo '<form method="get" target="_blank" action="editarelacaoobjetivo.php">';
+			$Sql2 = "SELECT * FROM `tbobjectives`";
+			$rs2 = mysql_query($Sql2, $conexao) or die ("Erro na pesquisa");
+			while ($linha2 =  mysql_fetch_array($rs2)){ 
+					
+				echo '<label><input name="Checkbox2[]" type="checkbox" value="'.$linha2["idtbObjectives"].'"';
+				$Sql3 = "SELECT * FROM `tbobjectives_has_tbUserquestion` WHERE `tbUserQuestion_idtbUserQuestion` = ".$id." AND `tbobjectives_idtbobjectives` = ".$linha2["idtbObjectives"];
+				//echo $Sql3;
+				$rs3 = mysql_query($Sql3, $conexao);
+				while ($linha3 =  mysql_fetch_array($rs3)){				
+					echo 'checked="checked" ';
+				}
+				echo '/>'.$linha2["tbObjectivesDesc"].'</label><br>';
+				
+			}
+			echo '<input name="txt_questao" value="'.$id.'" size="12" type="text" hidden/>';	
+			echo '<button type="submit" name="submitobjective"><span class="glyphicon glyphicon-refresh"></span></button></form>';
+						
 			
 			
-			echo    '<td><form method="post" action="">
-<label><input name="Checkbox1" type="checkbox" value=""/>Objetivo</label>
-<label><input name="Checkbox1" type="checkbox" value=""/>Objetivo</label>
-<label><input name="Checkbox1" type="checkbox" value=""/>Objetivo</label>
-<label><input name="Checkbox1" type="checkbox" value=""/>Objetivo</label>
-</form>
-';
-			echo "</td>";
+			
+			
+			echo '</td>';
 
 			
 			echo    "<td>";			
@@ -107,8 +132,8 @@ $rs = mysql_query($Sql, $conexao) or die ("Erro na pesquisa");
 			
 			echo   "<td>".$question."</td>";
 			echo   "<td>".$howto."</td>";
-			echo   '<td><a href="editaquestao.php?id='.$id.'&artifact='.$artifact.'&criterion='.$criterion.'&question='.$question.'&howto='.$howto.'"><img src="img/editar.png" alt="Editar" height="30"/></a></td>';
-			echo   '<td><a href="deletaquestao.php?id='.$id.'&artifact='.$artifact.'&criterion='.$criterion.'&question='.$question.'&howto='.$howto.'"><img src="img/deletar.jpg" alt="Excluir" height="30"/></a></td>';
+			echo   '<td><a href="editaquestao.php?id='.$id.'&artifact='.$artifact.'&criterion='.$criterion.'&subcriterion='.$subcriterion.'&question='.$question.'&howto='.$howto.'"><img src="img/editar.png" alt="Editar" height="30"/></a></td>';
+			echo   '<td><a href="deletaquestao.php?id='.$id.'&artifact='.$artifact.'&criterion='.$criterion.'&subcriterion='.$subcriterion.'&question='.$question.'&howto='.$howto.'"><img src="img/deletar.jpg" alt="Excluir" height="30"/></a></td>';
 			echo  "</tr>";
 			}
 ?>
