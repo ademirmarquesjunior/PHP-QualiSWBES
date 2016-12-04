@@ -14,7 +14,7 @@
 <a href="inserequestao.php"><img src="img/images.png" height="30" alt="Adicionar nova" /></a>
 </p>
 
-Ordenar por <a href="listaquestao.php?order=1">Personagem</a>, <a href="listaquestao.php?order=2">Artefato</a>, ou <a href="listaquestao.php?order=3">Critério</a>.
+Ordenar por <a href="listausuario.php?order=1">Personagem</a>, <a href="listausuario.php?order=2">Artefato</a>, ou <a href="listausuario.php?order=3">Critério</a>.
 
 <table class="table-bordered" >
 <tr>
