@@ -38,10 +38,10 @@ if ((isset($_POST['sel_artifact'])) && (isset($_POST['sel_criterion'])) && (isse
 ?>
 
 
-<h1>Inserção de questões</h1>
+<h1>Inserir nova questão</h1>
+<p><a href='listaquestao.php'><img src='img/voltar.png' alt='Voltar para lista' height='30'/></a></p>
 
-
-<form id="form1" name="form1" method="post" action="inserequestao.php" class="form-horizontal">
+<form id="form1" name="form1" method="post" action="inserequestao.php" class="form-inline">
 <!-- <select name="sel_usuario" id="usuario"><?php $Sql = mysql_query("SELECT * FROM `tbusertype`"); while ($rr = mysql_fetch_array($Sql)) { echo "<option value=".$rr['idtbUserType'].">".$rr['tbUserTypeDescripton']."</option>"; } ?></select> -->
 <select name="sel_artifact" id="artifact" class="form-control"><option value="">Artefato</option><?php $Sql = mysql_query("SELECT * FROM `tbArtifact`"); while ($rr = mysql_fetch_array($Sql)) { echo "<option value=".$rr['idtbArtifact'].">".$rr['tbArtifactDescription']."</option>"; } ?></select>
 <select name="sel_criterion" id="criterion"class="form-control"><option value="">Critério</option><?php $Sql = mysql_query("SELECT * FROM `tbCriterion`"); while ($rr = mysql_fetch_array($Sql)) { echo "<option value=".$rr['idtbCriterion'].">".$rr['tbCriterionDesc']."</option>"; } ?></select>

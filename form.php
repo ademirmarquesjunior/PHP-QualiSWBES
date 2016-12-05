@@ -10,7 +10,9 @@
     </head>
 
     <body>
-
+    <?php
+    	include "conecta.php";
+	?>
         <div class="container-fluid">
             <div class="jumbotron">
                 <h2>Modelo de Avaliação de Qualidade dos Sistemas Educacionais baseados 
@@ -24,12 +26,16 @@
                 <div class="panel panel-default">
                     <div class="panel-body">
                         <h1>Questionário</h1>
-                        Você está avaliando 'Aplicação' como 'usuário'.</div>
-                </div>
+                        Você está avaliando <strong>'<?php $Sql = mysql_query("SELECT * FROM `tbapplication` WHERE `idtbapplication` = ".$_SESSION['appic_id']); while ($rr = mysql_fetch_array($Sql)) { echo $rr['tbApplicationName']; } ?></strong>'
+                         como <strong>'<?php $Sql = mysql_query("SELECT * FROM `tbUserType` WHERE `idtbUserType` = ".$_SESSION['user_type']); while ($rr = mysql_fetch_array($Sql)) { echo $rr['tbUserTypeDescripton']; } ?>'  
+						</strong>  
+					</div>
+               	 </div>
                 <div class="panel panel-default">
                     <div class="panel-body">
+                            
                         <?php
-                        include "conecta.php";
+                        //include "conecta.php";
 
 
                         $inserted = 0;
@@ -52,12 +58,12 @@
                         $artifact_change = '';
 
 //$Sql = "SELECT * FROM `tbuserquestion` WHERE tbusertype_idtbUsertype = '".$_SESSION['user_type']."' ".$order;
-                        $Sql = "SELECT * FROM `tbuserquestion` " . $order;
+                        $Sql = "SELECT * FROM tbuserquestion INNER JOIN tbusertype_has_tbuserquestion ON tbuserquestion.idtbUserQuestion = tbusertype_has_tbuserquestion.tbUserQuestion_idtbUserQuestion WHERE tbusertype_has_tbuserquestion.tbUserType_idtbUserType = ".$_SESSION['user_type']." ".$order;
+                        //echo $Sql;
                         $rs = mysql_query($Sql, $conexao) or die("Erro na pesquisa");
 
                         while ($linha = mysql_fetch_array($rs)) {
                             $id = $linha["idtbUserQuestion"];
-                            $usertype = $linha["tbUserType_idtbUserType"];
                             $artifact = $linha["tbArtifact_idtbArtifact"];
                             $criterion = $linha["tbCriterion_idtbCriterion"];
                             $question = $linha["tbUserQuestionText"];

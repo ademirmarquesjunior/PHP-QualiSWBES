@@ -15,16 +15,18 @@ if (isset($_GET['submitobjective'])) {
 
 	$objectives = $_GET['Checkbox2'];
 	$question = $_GET['txt_questao'];
+	$weight = $_GET['txt_peso'];
 
 	$Sql = "DELETE FROM `tbobjectives_has_tbUserquestion` WHERE `tbUserQuestion_idtbUserQuestion` = ".$question;
 	$rs = mysql_query($Sql, $conexao) or die ("Erro ao apagar");
 	
-	foreach ($objectives as $objective){
-		$Sql = "INSERT INTO `tbObjectives_has_tbUserquestion` (`tbObjectives_idtbObjectives`, `tbUserQuestion_idtbUserQuestion`) VALUES ('".$objective."', '".$question."')";
+	foreach ($objectives as $i=>$objective){
+		$Sql = "INSERT INTO `tbObjectives_has_tbUserquestion` (`tbObjectives_idtbObjectives`, `tbUserQuestion_idtbUserQuestion`, `tbObjectives_has_tbUserWeight` ) VALUES ('".$objective."', '".$question."', '".$weight[$objective-1]."')";
 		$rs = mysql_query($Sql, $conexao) or die ("Erro na inserção");
-		echo $objective."<br>";
+		echo $objective." ".$weight[$objective-1]."<br>";
 	}
-
+	
+	
 	echo  "<script type='text/javascript'>";
 	echo "window.close();";
 	echo "</script>";

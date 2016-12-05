@@ -8,47 +8,53 @@
         <title>SEWebS</title>
 </head>
 <body>
-
-<h1>Lista de questões</h1>
+<?php
+include "conecta.php";
+?>
+<h1>Gerenciamento de questões</h1>
 <p>
-<a href="inserequestao.php"><img src="img/images.png" height="30" alt="Adicionar nova" /></a>
+<a href="inserequestao.php"><img src="img/images.png" height="30" alt="Adicionar nova" />Inserir nova</a>
 </p>
 
-<input name="txt_senha1" id="entravalor4" size="12" type="text" hidden/>
+<form id="form2" name="form2" method="get" action="listaquestao.php" class="form-inline">
+<select name="sel_artifact" id="artifact" class="form-control"><option value="" selected>Artefato</option><?php $Sql = mysql_query("SELECT * FROM `tbArtifact`"); while ($rr = mysql_fetch_array($Sql)) { echo "<option value=".$rr['idtbArtifact'].">".$rr['tbArtifactDescription']."</option>"; } ?></select>
+<select name="sel_criterion" id="criterion"class="form-control"><option value="" selected>Critério</option><?php $Sql = mysql_query("SELECT * FROM `tbCriterion`"); while ($rr = mysql_fetch_array($Sql)) { echo "<option value=".$rr['idtbCriterion'].">".$rr['tbCriterionDesc']."</option>"; } ?></select>
+<input type="submit" name="submitlistar" value="Listar" class="btn btn-default"/>
+</form>
 
-Ordenar por <a href="listaquestao.php?order=1">Personagem</a>, <a href="listaquestao.php?order=2">Artefato</a>, ou <a href="listaquestao.php?order=3">Critério</a>.
 
 <table class="table table-condensed table-hover" >
 <tr>
 <td>ID</td>
 
 <td>Personagem</td>
-<td>Objetivo</td>
+<td style="width: 269px">Objetivo</td>
 <td>Artefato</td>
 <td>Critério</td>
-<td>SubCritério</td>
+<td style="width: 65px">SubCritério</td>
 <td>Questão</td>
-<td>Como responder</td>
+<!--<td>Como responder</td>-->
 <td></td>
 <td></td>
 
 <?php
-include "conecta.php";
-$order = "";
+//include "conecta.php";
+$list = "WHERE 1=1 ";
 
-if (isset($_GET["order"])) {
-	if (htmlspecialchars($_GET["order"]) == "1") {
-		$order = "ORDER BY `tbUserType_idtbUserType`";
-	} ELSEIF (htmlspecialchars($_GET["order"]) == "2") {
-		$order = "ORDER BY `tbArtifact_idtbArtifact`";
-	} ELSEIF (htmlspecialchars($_GET["order"]) == "3") {
-		$order = "ORDER BY `tbCriterion_idtbCriterion`";
-	} ELSE {
-		$order = "";
+if (isset($_GET["submitlistar"])) {
+	$artifact = $_GET['sel_artifact'];
+	$criterion = $_GET['sel_criterion'];
+	
+	if ($artifact != "") {
+		$list = $list." AND tbArtifact_idtbArtifact = ".$artifact;
+	}
+	
+	if ($criterion != "") {
+		$list = $list." AND tbCriterion_idtbCriterion = ".$criterion;
 	}
 }
 
-$Sql = "SELECT * FROM `tbuserquestion` ".$order;
+$Sql = "SELECT * FROM `tbuserquestion` ".$list;
 $rs = mysql_query($Sql, $conexao) or die ("Erro na pesquisa");
 
 		while($linha = mysql_fetch_array($rs))
@@ -89,15 +95,17 @@ $rs = mysql_query($Sql, $conexao) or die ("Erro na pesquisa");
 			$Sql2 = "SELECT * FROM `tbobjectives`";
 			$rs2 = mysql_query($Sql2, $conexao) or die ("Erro na pesquisa");
 			while ($linha2 =  mysql_fetch_array($rs2)){ 
-					
+				$weight = 0;
 				echo '<label><input name="Checkbox2[]" type="checkbox" value="'.$linha2["idtbObjectives"].'"';
 				$Sql3 = "SELECT * FROM `tbobjectives_has_tbUserquestion` WHERE `tbUserQuestion_idtbUserQuestion` = ".$id." AND `tbobjectives_idtbobjectives` = ".$linha2["idtbObjectives"];
 				//echo $Sql3;
 				$rs3 = mysql_query($Sql3, $conexao);
-				while ($linha3 =  mysql_fetch_array($rs3)){				
+				while ($linha3 =  mysql_fetch_array($rs3)){	
+					$weight = $linha3["tbObjectives_has_tbUserWeight"];		
 					echo 'checked="checked" ';
 				}
-				echo '/>'.$linha2["tbObjectivesDesc"].'</label><br>';
+				echo '/>'.$linha2["tbObjectivesDesc"].'</label>';
+				echo '<input name="txt_peso[]" value="'.$weight.'" size="2" type="text"/><br>';
 				
 			}
 			echo '<input name="txt_questao" value="'.$id.'" size="12" type="text" hidden/>';	
@@ -131,7 +139,7 @@ $rs = mysql_query($Sql, $conexao) or die ("Erro na pesquisa");
 			
 			
 			echo   "<td>".$question."</td>";
-			echo   "<td>".$howto."</td>";
+			//echo   "<td>".$howto."</td>";
 			echo   '<td><a href="editaquestao.php?id='.$id.'&artifact='.$artifact.'&criterion='.$criterion.'&subcriterion='.$subcriterion.'&question='.$question.'&howto='.$howto.'"><img src="img/editar.png" alt="Editar" height="30"/></a></td>';
 			echo   '<td><a href="deletaquestao.php?id='.$id.'&artifact='.$artifact.'&criterion='.$criterion.'&subcriterion='.$subcriterion.'&question='.$question.'&howto='.$howto.'"><img src="img/deletar.jpg" alt="Excluir" height="30"/></a></td>';
 			echo  "</tr>";
