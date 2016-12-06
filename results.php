@@ -69,8 +69,8 @@
                         <?php
                         $total = 0;
                         $counter = 0;
-                        $artifact = array();
-                        $artifact_weight = array();
+                        $sum = array(array(array()));
+                        $sym_weight = array(array(array()));
                         $form = $_GET['form'];
                         if ($form != '') {
                             //$Sql = "SELECT * FROM `tbform_has_tbuserquestion` WHERE `tbForm_idtbForm` = " . $form;
@@ -81,13 +81,13 @@
                                 $total = $total + $linha["tbForm_has_tbUserQuestionAnswer"]*$linha["tbObjectives_has_tbUserWeight"];
                                 $counter = $counter + $linha["tbObjectives_has_tbUserWeight"];
                                 
-                                if (!isset($artifact[$linha["tbArtifact_idtbArtifact"]])){
-                                	$artifact[$linha["tbArtifact_idtbArtifact"]] = NULL;
-                                	$artifact_weight[$linha["tbArtifact_idtbArtifact"]] = NULL;
+                                if (!isset($sum[$linha["tbArtifact_idtbArtifact"]][$linha["tbCriterion_idtbCriterion"]][$linha["tbSubCriterion_idtbSubCriterion"]])){
+                                	$sum[$linha["tbArtifact_idtbArtifact"]][$linha["tbCriterion_idtbCriterion"]][$linha["tbSubCriterion_idtbSubCriterion"]] = NULL;
+                                	$sum_weight[$linha["tbArtifact_idtbArtifact"]][$linha["tbCriterion_idtbCriterion"]][$linha["tbSubCriterion_idtbSubCriterion"]] = NULL;
                                 }
                                 
-                                $artifact[$linha["tbArtifact_idtbArtifact"]] = $artifact[$linha["tbArtifact_idtbArtifact"]] + $linha["tbForm_has_tbUserQuestionAnswer"];
-								$artifact_weight[$linha["tbArtifact_idtbArtifact"]] = $artifact_weight[$linha["tbArtifact_idtbArtifact"]] + $linha["tbObjectives_has_tbUserWeight"];
+                                $sum[$linha["tbArtifact_idtbArtifact"]][$linha["tbCriterion_idtbCriterion"]][$linha["tbSubCriterion_idtbSubCriterion"]] = $sum[$linha["tbArtifact_idtbArtifact"]][$linha["tbCriterion_idtbCriterion"]][$linha["tbSubCriterion_idtbSubCriterion"]] + $linha["tbForm_has_tbUserQuestionAnswer"]*$linha["tbObjectives_has_tbUserWeight"];
+                                $sum_weight[$linha["tbArtifact_idtbArtifact"]][$linha["tbCriterion_idtbCriterion"]][$linha["tbSubCriterion_idtbSubCriterion"]] = $sum_weight[$linha["tbArtifact_idtbArtifact"]][$linha["tbCriterion_idtbCriterion"]][$linha["tbSubCriterion_idtbSubCriterion"]] + $linha["tbObjectives_has_tbUserWeight"];
                             }
                             if ($counter != 0)
 								echo "<p>Atende:";
@@ -96,23 +96,38 @@
                                 echo "</h2></p>";
                                 echo "<p>Questões nessa categoria: ".$counter."</p>";
                             }
+                           
                             
-
-                            foreach ($artifact as $i=>$art) {
-                            	if ($art != 0) {
-	                            	echo "<p>";  
-	                            	$Sql = mysql_query("SELECT * FROM `tbArtifact` WHERE idtbArtifact = ".$i);
+                            foreach ($sum as $i=>$valueartifact) {
+                            	echo "<p><br>";
+                            	$Sql = mysql_query("SELECT * FROM `tbArtifact` WHERE idtbArtifact = ".$i);
 	                            	while ($rr = mysql_fetch_array($Sql)) {
-	                            		echo $rr['tbArtifactDescription']." "; 
-	                            	}                          	
-	                            	echo $art/$artifact_weight[$i]*20;
-	                            	echo "%";
-	                            	//echo " ";                            	
-	                            	//echo $artifact_weight[$i];
-	                            	echo "</p>";
-
+	                            		echo $rr['tbArtifactDescription']."<br> "; 
+	                            	} 
+                            	foreach ($valueartifact as $j=>$valuecriterion) {
+	                            	$Sql = mysql_query("SELECT * FROM `tbCriterion` WHERE idtbCriterion = ".$j);
+		                            	while ($rr = mysql_fetch_array($Sql)) {
+		                            		echo $rr['tbCriterionDesc']."<br> "; 
+	                            	}                           	
+                            	
+                            		//echo "...".$j."<br>";
+                            		foreach ($valuecriterion as $k=>$valuesubcriterion) {
+                            			$Sql = mysql_query("SELECT * FROM `tbSubCriterion` WHERE idtbSubCriterion = ".$k);
+		                            	while ($rr = mysql_fetch_array($Sql)) {
+		                            		echo $rr['tbSubCriterionDesc']." "; 
+	                            		}  
+                            		
+                            			$result = $valuesubcriterion/$sum_weight[$i][$j][$k]*20;
+                            			printf("%0.2f %%",$result); 
+                            			//echo " ".$result;
+                            			echo "<br>";
+                            			
+                            		}
+                            	
                             	}
+                            	echo "</p>";
                             }
+                            
                             
                         ?>
                         
