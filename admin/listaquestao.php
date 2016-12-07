@@ -27,12 +27,12 @@ include "conecta.php";
 <tr>
 <td>ID</td>
 
-<td>Personagem</td>
+<td>Avaliador</td>
 <td style="width: 269px">Objetivo</td>
 <td>Artefato</td>
+<td>Fator</td>
+<td style="width: 65px">SubFator</td>
 <td>Critério</td>
-<td style="width: 65px">SubCritério</td>
-<td>Questão</td>
 <!--<td>Como responder</td>-->
 <td></td>
 <td></td>
