@@ -5,6 +5,7 @@
     <!-- <link rel="stylesheet" href="estilo.css" type="text/css" media="screen" /> -->
     <link href="css/bootstrap.min.css" rel="stylesheet">
     <link href="css/style.css" rel="stylesheet">
+    <link rel="icon" type="image/png" href="favicon.png">
     <title>Avalia SEWebS</title>
 </head>
 
@@ -33,7 +34,7 @@
             
         <h3>Cadastre-se:</h3>
         <?php
-        session_start();
+        //session_start();
 // isset verifica se a sessão já existe
         /*
           if(isset($_SESSION['user_login']))

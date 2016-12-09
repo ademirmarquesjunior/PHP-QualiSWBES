@@ -6,6 +6,7 @@
         <!-- <link rel="stylesheet" href="estilo.css" type="text/css" media="screen" /> -->
         <link href="css/bootstrap.min.css" rel="stylesheet">
         <link href="css/style.css" rel="stylesheet">
+        <link rel="icon" type="image/png" href="favicon.png">
         <title>Avalia SEWebS</title>
     </head>
 
@@ -124,11 +125,19 @@ while ($rr = mysql_fetch_array($Sql)) {
             ?><hr>
             <h3>Minhas avaliações concluídas</h3>
             <?php
+            $i = 0;
             $Sql = mysql_query("SELECT * FROM tbform INNER JOIN tbapplication ON tbapplication.idtbApplication = tbform.tbApplication_idtbApplication WHERE tbform.tbformCompleted = 1 AND tbform.tbUser_idtbUser = " . $_SESSION['user_id']);
             while ($rr = mysql_fetch_array($Sql)) {
                 echo "<span class='glyphicon glyphicon-check'></span><a href='results.php?form=" . $rr['idtbForm'] . "'>" . $rr['tbApplicationName'] . "</a><br>";
-            }
-            ?>
+ 				$i++;
+           }
+            if ($i == 0) echo "Não há avaliações concluídas<br>";
+            echo "<p></p>";
+
+            
+            ?><hr>
+            
+            
             <h3>Avaliações pendentes</h3>
             <?php
             $i = 0;
@@ -141,11 +150,11 @@ while ($rr = mysql_fetch_array($Sql)) {
             echo "<p></p>";
             ?>
 			<?php
-				unset($_SESSION['applic_id']);
-				unset($_SESSION['form_id']);
+				//unset($_SESSION['applic_id']);
+				//unset($_SESSION['form_id']);
 			
 			?>
-
+			<hr>
             <div id="footer" class="well well-sm">
                 Desenvolvimento: Ademir Marques Junior - 2016 </div>
         </div>

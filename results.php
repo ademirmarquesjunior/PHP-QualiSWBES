@@ -9,6 +9,7 @@
         <script src="Chart.min.js"></script>
         <script src="dist/sweetalert.js"></script>
 	    <link rel="stylesheet" href="dist/sweetalert.css">
+	    <link rel="icon" type="image/png" href="favicon.png">
         <title>Avalia SEWebS</title>
     </head>
     <?php
@@ -68,17 +69,21 @@
             $resultados = array();
             $values = array();
             $names = array();
+            $texts = array();
+            $counter = array();
             $resultados_exp = array();
 
             $Sql = "SELECT * FROM `tbobjectives`";
             $rs = mysql_query($Sql, $conexao) or die("Erro na pesquisa");
             while ($linha = mysql_fetch_array($rs)) {
                 $names[$linha["idtbObjectives"] - 1] = $linha["tbObjectivesDesc"];
+                $texts[$linha["idtbObjectives"] - 1] = $linha["tbObjectivesText"];
 
                 $resultados[$linha["idtbObjectives"]] = array();
                 $resultados[$linha["idtbObjectives"]] = extraiResultados($_GET['form'], $linha["idtbObjectives"]);
                 $value = $resultados[$linha["idtbObjectives"]][2] / $resultados[$linha["idtbObjectives"]][3] * 20;
                 $values[$linha["idtbObjectives"] - 1] = $value;
+                $counter[$linha["idtbObjectives"]] = $resultados[$linha["idtbObjectives"]][4];
                 $resultados_exp[$linha["idtbObjectives"]] = detalhaResultados($resultados[$linha["idtbObjectives"]]);
             }
             ?>
@@ -136,9 +141,11 @@
 ';
                                     echo '<h2>' . $names[$i-1] ." ";
                                     printf("%0.2f%% ", $values[$i-1]);
-                                    echo '</h2>';
-                                    echo '<p>Explicação curta sobre o objetivo. Obs: talvez fazer uma entrada para esse texto no banco de dados. Obs2: Ler esse texto do banco de dados devido à repetição</p>';
-                                    echo 'Os seguintes Artefatos foram avaliados para alcançar este objetivos. Cada artefato ainda é detalhado em fatores e subfatores avaliados:';
+                                    echo '</h2><p>';
+                                    echo 'Questões nessa categoria <strong>'.$counter[$i];
+                                    echo '</strong><p>';
+                                    echo $texts[$i-1];
+                                    echo '</p><p>Os seguintes Artefatos foram avaliados para alcançar este objetivos. Cada artefato ainda é detalhado em fatores e subfatores avaliados:</p>';
                                     echo '<canvas id="GraficoArtefato' . $i . '" style="width:100%;"></canvas>';
                                     echo '
 		            <script type="text/javascript">

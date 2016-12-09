@@ -8,6 +8,7 @@
         <link href="css/style.css" rel="stylesheet">
         <script src="dist/sweetalert.js"></script>
     	<link rel="stylesheet" href="dist/sweetalert.css">
+    	<link rel="icon" type="image/png" href="favicon.png">
         <title>Avalia SEWebS</title>
     </head>
 
