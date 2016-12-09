@@ -6,7 +6,9 @@
         <!-- <link rel="stylesheet" href="estilo.css" type="text/css" media="screen" /> -->
         <link href="css/bootstrap.min.css" rel="stylesheet">
         <link href="css/style.css" rel="stylesheet">
-        <title>SEWebS</title>
+        <script src="dist/sweetalert.js"></script>
+    	<link rel="stylesheet" href="dist/sweetalert.css">
+        <title>Avalia SEWebS</title>
     </head>
 
     <body>
@@ -22,6 +24,12 @@
                 <?php
                 include("valida.php");
                 ?></div>
+	            <?php
+	            include 'navbar.php';
+	            ?>
+
+                
+                
             <form action="form.php" class="form-group" method="get">
                 <div class="panel panel-default">
                     <div class="panel-body">
@@ -35,9 +43,6 @@
                     <div class="panel-body">
                             
                         <?php
-                        //include "conecta.php";
-
-
                         $inserted = 0;
                         /* verificar se o formulário já foi preenchido antes */
                         foreach ($_GET as $key => $value) {
@@ -51,6 +56,8 @@
                         }
 
                         if ($inserted == 1) {
+                        	$Sql = "UPDATE `tbform` SET `tbformCompleted` = '1' WHERE `tbform`.`idtbForm` = ".$_SESSION['form_id']." AND `tbform`.`tbApplication_idtbApplication` = ".$_SESSION['appic_id']." AND `tbform`.`tbUser_idtbUser` = ".$_SESSION['user_id']."";
+                            $rs = mysql_query($Sql, $conexao) or die("Erro completa formulário");
                             header('Location:results.php?form=' . $_SESSION['form_id']);
                         }
 
@@ -99,7 +106,11 @@
     <div id="footer" class="well well-sm">
         Desenvolvimento: Ademir Marques Junior - 2016 </div>
 </div>
-
+<script>
+         window.onload = function(){
+    		swal("Neste aviso estará um pequeno texto explicando sobre o que será avaliado em geral, destacando que os objetos avaliados dependem do tipo de avaliador que está usando o sistema de avaliação.");
+          }           
+         </script>
 </body>
 
 </html>

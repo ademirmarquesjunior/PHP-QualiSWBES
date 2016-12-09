@@ -6,7 +6,7 @@
 <!-- <link rel="stylesheet" href="estilo.css" type="text/css" media="screen" /> -->
 <link href="css/bootstrap.min.css" rel="stylesheet">
 <link href="css/style.css" rel="stylesheet">
-<title>SEWebS</title>
+<title>Avalia SEWebS</title>
 </head>
 
 <body>
@@ -16,11 +16,15 @@
 		<h2>Modelo de Avaliação de Qualidade dos Sistemas Educacionais
 baseados em Web Semântica (SEWebS) </h2>
 	</div>
-	<div id="login">
+	<div id="login" class="well well-sm">
 		<?php
 //include("valida.php");
 echo 'Bem vindo visitante';
 ?></div>
+            <?php
+            include 'navbar.php';
+            ?>
+
 	<h3>Login de usuário</h3>
 	<?php
 session_start();

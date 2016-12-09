@@ -5,7 +5,7 @@
     <!-- <link rel="stylesheet" href="estilo.css" type="text/css" media="screen" /> -->
     <link href="css/bootstrap.min.css" rel="stylesheet">
     <link href="css/style.css" rel="stylesheet">
-    <title>Cadastrar Usuário</title>
+    <title>Avalia SEWebS</title>
 </head>
 
 <body>
@@ -15,11 +15,22 @@
             <h2>Modelo de Avaliação de Qualidade dos Sistemas Educacionais
                 baseados em Web Semântica (SEWebS) </h2>
         </div>
-        <div id="login">
+        <div id="login" class="well well-sm">
             <?php
 //include("valida.php");
+			session_start();
             echo 'Bem vindo visitante';
+			if (isset($_SESSION['user_login'])) {
+				echo '1';
+				header('Location:index2.php');
+			}
+            
             ?></div>
+            
+            <?php
+            include 'navbar.php';
+            ?>
+            
         <h3>Cadastre-se:</h3>
         <?php
         session_start();

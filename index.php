@@ -5,7 +5,7 @@
 <!-- <link rel="stylesheet" href="estilo.css" type="text/css" media="screen" /> -->
 <link href="css/bootstrap.min.css" rel="stylesheet" />
 <link href="css/style.css" rel="stylesheet" />
-<title>SEWebS</title>
+<title>Avalia SEWebS</title>
 </head>
 
 <body>
@@ -18,12 +18,20 @@
 	<div id="login" class="well well-sm">
 		Bem vindo <?php
 //include("valida.php");
+session_start();
 if(isset($_SESSION['user_login'])) {
-echo " ".$_SESSION['user_login']."' ";
+echo " '".$_SESSION['user_login']."' ";
 echo "<a href='logout.php'>Sair</a>";
 } ?></div>
+
+            <?php
+            include 'navbar.php';
+            ?>
+
+
 	<div class="row">
 		<div class="col-md-8">
+			<h1>Modelo de Avaliação de Qualidade dos Sistemas Educacionais baseados em Web Semântica:<br> Avalia SEWebS</h1>
 			<p>Esse Modelo de Avaliação de Qualidade dos Sistemas Educacionais baseados 
 			em Web Semântica (SEWebS) tem por objetivo permitir que os profissionais 
 			(engenheiros do conhecimento, engenheiros de ontologias, desenvolvedores, 
@@ -67,10 +75,11 @@ echo "<a href='logout.php'>Sair</a>";
 		<div class="col-md-2">
 		</div>
 	</div>
-</div>
-<div id="footer" class="well well-sm">
+	<div id="footer" class="well well-sm">
 	Desenvolvimento: Ademir Marques Junior - 2016 </div>
+	</div>
 </div>
+
 
 
 </body>

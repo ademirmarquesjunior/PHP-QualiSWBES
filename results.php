@@ -7,13 +7,17 @@
         <link href="css/bootstrap.min.css" rel="stylesheet">
         <link href="css/style.css" rel="stylesheet">
         <script src="Chart.min.js"></script>
-        <title>SEWebS</title>
+        <script src="dist/sweetalert.js"></script>
+	    <link rel="stylesheet" href="dist/sweetalert.css">
+        <title>Avalia SEWebS</title>
     </head>
     <?php
     if (!isset($_GET['form']))
         exit;
     include "conecta.php";
     include "function.inc.php";
+    
+    
     ?>
     <body>
         <div class="container-fluid">
@@ -25,15 +29,32 @@
                 <?php
                 include("valida.php");
                 ?></div>
+            <?php
+            include 'navbar.php';
+            ?>
             <div class="panel panel-default">
                 <div class="panel-body">
                     <h1>Resultado de avaliação</h1>
-                    Você avaliou <strong>'<?php $Sql = mysql_query("SELECT * FROM tbform INNER JOIN tbapplication ON tbapplication.idtbApplication = tbform.tbApplication_idtbApplication WHERE tbform.idtbForm = " . $_GET['form']);
-                $i = 0;
-                while ($rr = mysql_fetch_array($Sql)) {
-                    echo $rr['tbApplicationName'];
-                    $i++;
-                } if (!($i)) header('Location:index2.php'); ?></strong>'
+                    Você avaliou <strong>'
+                    <?php 
+                    $Sql = mysql_query("SELECT * FROM tbform INNER JOIN tbapplication ON tbapplication.idtbApplication = tbform.tbApplication_idtbApplication WHERE tbform.idtbForm = " . $_GET['form']." AND tbUser_idtbUser = ".$_SESSION['user_id']);
+                	$i = 0;
+                	$completed = 0;
+                	$applic_id = 0;
+                	while ($rr = mysql_fetch_array($Sql)) {
+	                    echo $rr['tbApplicationName'];
+	                    $completed = $rr['tbformCompleted'];
+	                    $applic_id = $rr['idtbApplication'];
+	                    $i++;
+                	} 
+                	if ((!($completed)) AND ($i)) { //Se o formulário não foi finalizado
+                		$_SESSION['form_id'] = $_GET['form'];
+                		$_SESSION['appic_id'] = $applic_id;
+                		header('Location:form.php'); 
+                	}
+                	if (!($i)) header('Location:index2.php');
+                	                	
+                	?></strong>'
                     como <strong>'<?php $Sql = mysql_query("SELECT * FROM `tbUserType` WHERE `idtbUserType` = " . $_SESSION['user_type']);
                 while ($rr = mysql_fetch_array($Sql)) {
                     echo $rr['tbUserTypeDescripton'];
@@ -74,7 +95,7 @@
 
                             echo '
 		            <script type="text/javascript">
-                var options = { responsive:true, scaleOverride:true, scaleSteps:10, scaleStartValue:0, scaleStepWidth:10, display:true };
+                var options = { responsive:true, scaleOverride:true, scaleSteps:10, scaleStartValue:0, scaleStepWidth:10};
 
                 var data = {
                     labels: [';
@@ -155,11 +176,11 @@
                             Desenvolvimento: Ademir Marques Junior - 2016 </div>
                     </div>
                     <?php
-                    echo '<script>
-         window.onload = function(){
-          ' . $loadgraph . '     
-          }           
-         </script>';
+				         echo '<script>
+				         window.onload = function(){
+				          ' . $loadgraph . '     
+				          }
+				          </script>';
                     ?>        
 
 
