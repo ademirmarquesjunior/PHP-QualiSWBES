@@ -131,10 +131,14 @@ while ($rr = mysql_fetch_array($Sql)) {
             ?>
             <h3>Avaliações pendentes</h3>
             <?php
+            $i = 0;
             $Sql = mysql_query("SELECT * FROM tbform INNER JOIN tbapplication ON tbapplication.idtbApplication = tbform.tbApplication_idtbApplication WHERE tbform.tbformCompleted = 0 AND tbform.tbUser_idtbUser = " . $_SESSION['user_id']);
             while ($rr = mysql_fetch_array($Sql)) {
                 echo "<span class='glyphicon glyphicon-expand'></span><a href='results.php?form=" . $rr['idtbForm'] . "'>" . $rr['tbApplicationName'] . "</a><br>";
+                $i++;
             }
+            if ($i == 0) echo "Não há nenhuma avaliação pendente<br>";
+            echo "<p></p>";
             ?>
 			<?php
 				unset($_SESSION['applic_id']);
