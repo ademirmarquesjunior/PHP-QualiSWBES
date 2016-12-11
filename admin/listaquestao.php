@@ -27,8 +27,7 @@ include "conecta.php";
 <tr>
 <td>ID</td>
 
-<td>Avaliador</td>
-<td style="width: 269px">Objetivo</td>
+<td style="width: 440px">Avaliador X Objetivo</td>
 <td>Artefato</td>
 <td>Fator</td>
 <td style="width: 65px">SubFator</td>
@@ -36,6 +35,9 @@ include "conecta.php";
 <!--<td>Como responder</td>-->
 <td></td>
 <td></td>
+
+
+
 
 <?php
 //include "conecta.php";
@@ -54,11 +56,12 @@ if (isset($_GET["submitlistar"])) {
 	}
 }
 
+
+
 $Sql = "SELECT * FROM `tbuserquestion` ".$list;
 $rs = mysql_query($Sql, $conexao) or die ("Erro na pesquisa");
 
-		while($linha = mysql_fetch_array($rs))
-		{
+		while($linha = mysql_fetch_array($rs)) {
 			$id=$linha["idtbUserQuestion"];
 			$artifact=$linha["tbArtifact_idtbArtifact"];
 			$criterion=$linha["tbCriterion_idtbCriterion"];
@@ -71,53 +74,47 @@ $rs = mysql_query($Sql, $conexao) or die ("Erro na pesquisa");
 			echo  "<tr>";
 			echo    "<td>".$id."</td>";
 			echo    '<td>';
-			echo '<form method="get" target="_blank" action="editarelacaoquestao.php">';
+			echo '<form method="get" target="_blank" action="editarelacaoquestao.php" class="form form-inline">';
+			
+			$Sql2 = "SELECT * FROM `tbusertype`";
+			echo '<select name="sel_user" id="user" class="form-control" style="width: 35%">';
+			echo '<option value="">Avaliador</option>';
+			$rs2 = mysql_query($Sql2, $conexao) or die ("Erro na pesquisa");
+			while ($linha2 =  mysql_fetch_array($rs2)){ 
+				echo "<option value=" . $linha2['idtbUserType'] . ">" . $linha2['tbUserTypeDescripton'] . "</option>";
+			}
+			echo '</select>';
+			
+			echo '<input name="txt_question" value="'.$id.'" size="12" type="text" hidden/>';
+			
+			$Sql2 = "SELECT * FROM `tbObjectives`";
+			echo '<select name="sel_objective" id="objective" class="form-control" style="width: 35%">';
+			echo '<option value="">Objetivo</option>';
+			$rs2 = mysql_query($Sql2, $conexao) or die ("Erro na pesquisa");
+			while ($linha2 =  mysql_fetch_array($rs2)){ 
+				echo "<option value=".$linha2['idtbObjectives'].">".$linha2['tbObjectivesDesc']."</option>";
+			}
+			echo '</select>';
+			echo '<input name="txt_weight" value="1.00" size="1" type="text" class="form-control"/>';
+			echo '<button type="submit" name="submitRelationDel" onClick="window.location.reload()"><span class="glyphicon glyphicon-minus-sign"></span></button>';
+			echo '<button type="submit" name="submitRelationAdd" onClick="window.location.reload()"><span class="glyphicon glyphicon-plus-sign"></span></button></form>';
+			
+			echo '<small>';
 			$Sql2 = "SELECT * FROM `tbusertype`";
 			$rs2 = mysql_query($Sql2, $conexao) or die ("Erro na pesquisa");
 			while ($linha2 =  mysql_fetch_array($rs2)){ 
-					
-				echo '<label><input name="Checkbox1[]" type="checkbox" value="'.$linha2["idtbUserType"].'"';
-				$Sql3 = "SELECT * FROM `tbusertype_has_tbUserquestion` WHERE `tbUserQuestion_idtbUserQuestion` = ".$id." AND `tbUserType_idtbUsertype` = ".$linha2["idtbUserType"];
+				echo "<strong>".$linha2['tbUserTypeDescripton']. ":</strong> ";
+				$Sql3 = "SELECT * FROM tbobjectives_has_tbuserquestion INNER JOIN tbobjectives ON tbobjectives_has_tbuserquestion.tbObjectives_idtbObjectives = tbobjectives.idtbObjectives WHERE tbobjectives_has_tbuserquestion.tbUserType_idtbUserType = ".$linha2['idtbUserType']." AND tbobjectives_has_tbuserquestion.tbUserQuestion_idtbUserQuestion = ".$id;
 				//echo $Sql3;
-				$rs3 = mysql_query($Sql3, $conexao);
-				while ($linha3 =  mysql_fetch_array($rs3)){				
-					echo 'checked="checked" ';
+				$rs3 = mysql_query($Sql3, $conexao) or die ("Erro na pesquisa");
+				while ($linha3 =  mysql_fetch_array($rs3)){ 
+					echo $linha3['tbObjectivesDesc']."(".$linha3['tbObjectives_has_tbUserWeight'].");";
 				}
-				echo '/>'.$linha2["tbUserTypeDescripton"].'</label><br>';
-				
+				echo ".<br>";
 			}
-			echo '<input name="txt_questao" value="'.$id.'" size="12" type="text" hidden/>';	
-			echo '<button type="submit" name="submituser"><span class="glyphicon glyphicon-refresh"></span></button></form>';
+			echo '</small>';			
 			echo "</td>";
 
-			echo    '<td>';
-			echo '<form method="get" target="_blank" action="editarelacaoobjetivo.php">';
-			$Sql2 = "SELECT * FROM `tbobjectives`";
-			$rs2 = mysql_query($Sql2, $conexao) or die ("Erro na pesquisa");
-			while ($linha2 =  mysql_fetch_array($rs2)){ 
-				$weight = 0;
-				echo '<label><input name="Checkbox2[]" type="checkbox" value="'.$linha2["idtbObjectives"].'"';
-				$Sql3 = "SELECT * FROM `tbobjectives_has_tbUserquestion` WHERE `tbUserQuestion_idtbUserQuestion` = ".$id." AND `tbobjectives_idtbobjectives` = ".$linha2["idtbObjectives"];
-				//echo $Sql3;
-				$rs3 = mysql_query($Sql3, $conexao);
-				while ($linha3 =  mysql_fetch_array($rs3)){	
-					$weight = $linha3["tbObjectives_has_tbUserWeight"];		
-					echo 'checked="checked" ';
-				}
-				echo '/>'.$linha2["tbObjectivesDesc"].'</label>';
-				echo '<input name="txt_peso[]" value="'.$weight.'" size="2" type="text"/><br>';
-				
-			}
-			echo '<input name="txt_questao" value="'.$id.'" size="12" type="text" hidden/>';	
-			echo '<button type="submit" name="submitobjective"><span class="glyphicon glyphicon-refresh"></span></button></form>';
-						
-			
-			
-			
-			
-			echo '</td>';
-
-			
 			echo    "<td>";			
 			$Sql2 = "SELECT * FROM `tbArtifact` WHERE `idtbArtifact` = ".$artifact;
 			$rs2 = mysql_query($Sql2, $conexao) or die ("Erro na pesquisa");
@@ -146,6 +143,7 @@ $rs = mysql_query($Sql, $conexao) or die ("Erro na pesquisa");
 			}
 ?>
 </table>
+<form method="get" target="_blank" action="editarelacaoquestao.php" class="form form-horizontal">
 </body>
 
 </html>

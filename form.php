@@ -66,7 +66,7 @@
                         $artifact_change = '';
 
 //$Sql = "SELECT * FROM `tbuserquestion` WHERE tbusertype_idtbUsertype = '".$_SESSION['user_type']."' ".$order;
-                        $Sql = "SELECT * FROM tbuserquestion INNER JOIN tbusertype_has_tbuserquestion ON tbuserquestion.idtbUserQuestion = tbusertype_has_tbuserquestion.tbUserQuestion_idtbUserQuestion WHERE tbusertype_has_tbuserquestion.tbUserType_idtbUserType = ".$_SESSION['user_type']." ".$order;
+                        $Sql = "SELECT * FROM tbuserquestion INNER JOIN tbobjectives_has_tbuserquestion ON tbuserquestion.idtbUserQuestion = tbobjectives_has_tbuserquestion.tbUserQuestion_idtbUserQuestion WHERE tbobjectives_has_tbuserquestion.tbUserType_idtbUserType =  ".$_SESSION['user_type']." ".$order;
                         //echo $Sql;
                         $rs = mysql_query($Sql, $conexao) or die("Erro na pesquisa");
 
