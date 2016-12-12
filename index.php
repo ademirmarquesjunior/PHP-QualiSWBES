@@ -1,5 +1,5 @@
+<?php session_start(); ?>
 <!DOCTYPE html>
-
 <head>
 <meta content="text/html; charset=utf-8" http-equiv="content-type" />
 <!-- <link rel="stylesheet" href="estilo.css" type="text/css" media="screen" /> -->
@@ -8,7 +8,6 @@
 <link rel="icon" type="image/png" href="favicon.png">
 <title>Avalia SEWebS</title>
 </head>
-
 <body>
 
 <div class="container-fluid">
@@ -19,10 +18,9 @@
 	<div id="login" class="well well-sm">
 		Bem vindo <?php
 //include("valida.php");
-session_start();
 if(isset($_SESSION['user_login'])) {
-echo " '".$_SESSION['user_login']."' ";
-echo "<a href='logout.php'>Sair</a>";
+	echo " '".$_SESSION['user_login']."' ";
+	echo "<a href='logout.php'>Sair</a>";
 } ?></div>
 
             <?php

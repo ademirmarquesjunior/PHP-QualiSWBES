@@ -28,9 +28,10 @@ if ((isset($_POST['sel_artifact'])) && (isset($_POST['sel_criterion'])) && (isse
 	$weight = trim($_POST['txt_weight']);	
 	
 	
-	$Sql = mysql_query("INSERT INTO `tbuserquestion` (`idtbUserQuestion`, `tbArtifact_idtbArtifact`, `tbCriterion_idtbCriterion`, `tbSubCriterion_idtbSubCriterion`, `tbUserQuestionText`, `tbUserQuestionHowTo`, `tbUserQuestionWeight`) VALUES (NULL, '".$artifact."', '".$criterion."',  '".$subcriterion."', '".$question."', '".$howto."', '1');");
+	$Sql = "INSERT INTO `tbuserquestion` (`idtbuserquestion`, `tbartifact_idtbartifact`, `tbcriterion_idtbcriterion`, `tbsubcriterion_idtbsubcriterion`, `tbuserquestiontext`, `tbuserquestionhowto`, `tbuserquestionweight`) VALUES (NULL, '".$artifact."', '".$criterion."',  '".$subcriterion."', '".$question."', '".$howto."', '1');";
+	$rs = mysqli_query($conexao, $rs);
 
-	if ($Sql) {
+	if ($rs) {
 			echo "<script language='javascript' type='text/javascript'> alert('Inserido com sucesso!'); </script>";
 	
 	}
@@ -42,13 +43,38 @@ if ((isset($_POST['sel_artifact'])) && (isset($_POST['sel_criterion'])) && (isse
 <p><a href='listaquestao.php'><img src='img/voltar.png' alt='Voltar para lista' height='30'/></a></p>
 
 <form id="form1" name="form1" method="post" action="inserequestao.php" class="form-inline">
-<!-- <select name="sel_usuario" id="usuario"><?php $Sql = mysql_query("SELECT * FROM `tbusertype`"); while ($rr = mysql_fetch_array($Sql)) { echo "<option value=".$rr['idtbUserType'].">".$rr['tbUserTypeDescripton']."</option>"; } ?></select> -->
-<select name="sel_artifact" id="artifact" class="form-control"><option value="">Artefato</option><?php $Sql = mysql_query("SELECT * FROM `tbArtifact`"); while ($rr = mysql_fetch_array($Sql)) { echo "<option value=".$rr['idtbArtifact'].">".$rr['tbArtifactDescription']."</option>"; } ?></select>
-<select name="sel_criterion" id="criterion"class="form-control"><option value="">Critério</option><?php $Sql = mysql_query("SELECT * FROM `tbCriterion`"); while ($rr = mysql_fetch_array($Sql)) { echo "<option value=".$rr['idtbCriterion'].">".$rr['tbCriterionDesc']."</option>"; } ?></select>
-<select name="sel_subcriterion" id="subcriterion"class="form-control"><option value="">Subcritério</option><?php $Sql = mysql_query("SELECT * FROM `tbSubCriterion` ORDER BY `tbSubCriterionDesc`"); while ($rr = mysql_fetch_array($Sql)) { echo "<option value=".$rr['idtbSubCriterion'].">".$rr['tbSubCriterionDesc']."</option>"; } ?></select>
+<!-- <select name="sel_usuario" id="usuario"><?php $Sql = mysqli_query("SELECT * FROM `tbusertype`"); while ($rr = mysql_fetch_array($Sql)) { echo "<option value=".$rr['idtbUserType'].">".$rr['tbUserTypeDescripton']."</option>"; } ?></select> -->
+
+<select name="sel_artifact" id="artifact" class="form-control"><option value="">Artefato</option>
+<?php 
+$Sql = "SELECT * FROM `tbartifact`";
+$rs = mysqli_query($conexao, $Sql);
+while ($row = mysqli_fetch_array($rs, MYSQL_ASSOC)) {
+	echo "<option value=".$row['idtbArtifact'].">".$row['tbArtifactDescription']."</option>";
+} ?>
+</select>
+
+<select name="sel_criterion" id="criterion"class="form-control"><option value="">Critério</option>
+<?php 
+$Sql = "SELECT * FROM `tbcriterion`";
+$rs = mysqli_query($conexao, $Sql);
+while ($row = mysqli_fetch_array($rs, MYSQL_ASSOC)) {
+	echo "<option value=".$row['idtbCriterion'].">".$row['tbCriterionDesc']."</option>";
+} ?>
+</select>
+
+<select name="sel_subcriterion" id="subcriterion"class="form-control"><option value="">Subcritério</option>
+<?php 
+$Sql = "SELECT * FROM `tbsubcriterion` ORDER BY `tbsubcriteriondesc`";
+$rs = mysqli_query($conexao, $Sql);
+while ($row = mysqli_fetch_array($rs, MYSQL_ASSOC)) {
+	echo "<option value=".$row['idtbSubCriterion'].">".$row['tbSubCriterionDesc']."</option>";
+} ?>
+</select>
+
 <br>
-<!-- <select name="sel_objective" id="objective"><?php $Sql = mysql_query("SELECT * FROM `tbObjectives`"); while ($rr = mysql_fetch_array($Sql)) { echo "<option value=".$rr['idtbObjectives'].">".$rr['tbObjectivesDesc']."</option>"; } ?></select>-->
-<input name="txt_weight" type="text" value="1" class="form-control"/>
+<!-- <select name="sel_objective" id="objective"><?php $Sql = mysqli_query("SELECT * FROM `tbObjectives`"); while ($rr = mysql_fetch_array($Sql)) { echo "<option value=".$rr['idtbObjectives'].">".$rr['tbObjectivesDesc']."</option>"; } ?></select>
+<input name="txt_weight" type="text" value="1" class="form-control"/> -->
 <br>
 <label>Questão</label><br>
 <input name="txt_question" value="" type="text" size="100" class="form-control">

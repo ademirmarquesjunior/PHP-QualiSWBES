@@ -1,3 +1,4 @@
+<?php session_start(); ?>
 <!DOCTYPE html>
 <html>
 
@@ -38,28 +39,33 @@
                     <h1>Resultado de avaliação</h1>
                     Você avaliou <strong>'
                     <?php 
-                    $Sql = mysql_query("SELECT * FROM tbform INNER JOIN tbapplication ON tbapplication.idtbApplication = tbform.tbApplication_idtbApplication WHERE tbform.idtbForm = " . $_GET['form']." AND tbUser_idtbUser = ".$_SESSION['user_id']);
+                    $Sql = "SELECT * FROM tbform INNER JOIN tbapplication ON tbapplication.idtbApplication = tbform.tbApplication_idtbApplication WHERE tbform.idtbForm = " . $_GET['form']." AND tbUser_idtbUser = ".$_SESSION['user_id'];
+                    $rs = mysqli_query($conexao, $Sql);
                 	$i = 0;
                 	$completed = 0;
                 	$applic_id = 0;
-                	while ($rr = mysql_fetch_array($Sql)) {
-	                    echo $rr['tbApplicationName'];
-	                    $completed = $rr['tbformCompleted'];
-	                    $applic_id = $rr['idtbApplication'];
+                	while ($linha = mysqli_fetch_array($rs, MYSQLI_ASSOC)) {
+	                    echo $linha['tbApplicationName'];
+	                    $completed = $linha['tbformCompleted'];
+	                    $applic_id = $linha['idtbApplication'];
 	                    $i++;
                 	} 
                 	if ((!($completed)) AND ($i)) { //Se o formulário não foi finalizado
                 		$_SESSION['form_id'] = $_GET['form'];
                 		$_SESSION['appic_id'] = $applic_id;
-                		header('Location:form.php'); 
+                		echo "<script> window.location.assign('form.php')</script>";
+                		//header('Location:form.php'); 
                 	}
-                	if (!($i)) header('Location:index2.php');
+                	if (!($i)) echo "<script> window.location.assign('index2.php')</script>";
                 	                	
                 	?></strong>'
-                    como <strong>'<?php $Sql = mysql_query("SELECT * FROM `tbUserType` WHERE `idtbUserType` = " . $_SESSION['user_type']);
-                while ($rr = mysql_fetch_array($Sql)) {
-                    echo $rr['tbUserTypeDescripton'];
-                } ?>'  
+                    como <strong>'
+                    <?php 
+                    $Sql = "SELECT * FROM tbusertype WHERE idtbusertype = " . $_SESSION['user_type'];
+                    $rs = mysqli_query($conexao, $Sql);
+               		while ($linha = mysqli_fetch_array($rs, MYSQLI_ASSOC)) {
+                	    echo $linha['tbUserTypeDescripton'];
+                	} ?>'  
                     </strong>  
                 </div>
             </div>
@@ -74,8 +80,8 @@
             $resultados_exp = array();
 
             $Sql = "SELECT * FROM `tbobjectives`";
-            $rs = mysql_query($Sql, $conexao) or die("Erro na pesquisa");
-            while ($linha = mysql_fetch_array($rs)) {
+            $rs = mysqli_query($conexao, $Sql) or die("Erro na pesquisa");
+            while ($linha = mysqli_fetch_array($rs, MYSQLI_ASSOC)) {
                 $names[$linha["idtbObjectives"] - 1] = $linha["tbObjectivesDesc"];
                 $texts[$linha["idtbObjectives"] - 1] = $linha["tbObjectivesText"];
 

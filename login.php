@@ -1,3 +1,4 @@
+<?php session_start(); ?>
 <!DOCTYPE html>
 <html>
 
@@ -28,11 +29,11 @@ echo 'Bem vindo visitante';
 
 	<h3>Login de usuário</h3>
 	<?php
-session_start();
 if(isset($_SESSION['user_login'])) {
 echo "Bem vindo '".$_SESSION['user_login']."' ";
 echo "<a href='logout.php'>Sair</a>";
-header('Location:index.php');
+echo "<script> window.location.assign('index2.php')</script>";
+//header('Location:index.php');
 exit();
 } 
 ?>
@@ -60,28 +61,28 @@ exit();
 		$Sql="SELECT * FROM `tbuser` WHERE `tbEmail` = '".$usuario."' AND `tbPassword` = '".$senha."'";
 		//$Sql = "SELECT * FROM `tbuser` WHERE `tbEmail` = 'admin@admin' AND `tbPassword` = '21232f297a57a5a743894a0e4a801fc3'";
 		echo $Sql;
-		$rs=mysql_query($Sql, $conexao) or die ("<script language='javascript' type='text/javascript'> alert('Usuário ou senha incorreta'); window.location.href='login.php'; </script>");
+		$rs=mysqli_query($conexao, $Sql) or die ("<script language='javascript' type='text/javascript'> alert('Usuário ou senha incorreta'); window.location.href='login.php'; </script>");
 		
-		echo $rs;
+		//echo $rs;
 		
-		while($linha = mysql_fetch_array($rs))
-			{
+		while($linha = mysqli_fetch_array($rs, MYSQLI_ASSOC)) {
 			$user_id=$linha["idtbUser"];
 			$user_name=$linha["tbNome"];
 			echo $user_name;
 			$user_type=$linha["tbUserType_idtbUserType"];
-			}
+		}
 			
-			echo $user_name;
+		echo $user_name;
 			
-			if ($rs!=false) {		
+		if ($rs!=false) {		
 			$_SESSION['user_login'] = $user_name;
 			$_SESSION['user_id']=$user_id;
 			$_SESSION['user_type']=$user_type;
 			mysql_close($conexao);
-			header('Location:index2.php');
+			echo "<script> window.location.assign('index2.php')</script>";
+			//header('Location:index2.php');
 			
-			}
+		}
 	}
 			
 ?>

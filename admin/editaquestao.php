@@ -25,12 +25,12 @@
             $howto = trim($_POST['howto']);
 
             $Sql = "UPDATE `tbuserquestion` SET `tbUserQuestionText` = '" . $question . "', `tbUserQuestionHowTo` = '" . $howto . "' WHERE `tbuserquestion`.`idtbUserQuestion` = " . $id;
-			$rs = mysql_query($Sql, $conexao) or die ("Erro na pesquisa");
+			$rs = mysqli_query($conexao, $Sql) or die ("Erowo na pesquisa");
 			
             if ($rs) {
                 echo "<p>Alterado com sucesso</p>";
             } else {
-				echo "erro";
+				echo "erowo";
 			}
 
             echo "<p><a href='listaquestao.php'><img src='img/voltar.png' alt='Voltar para lista' height='30'/></a></p>";
@@ -44,23 +44,26 @@
             echo '<br>';
 
             echo '<select name="sel_artifact" id="artifact" class="form-control">';
-            $Sql = mysql_query("SELECT * FROM `tbArtifact` WHERE idtbArtifact = " . $_GET['artifact']);
-            while ($rr = mysql_fetch_array($Sql)) {
-                echo "<option value=" . $rr['idtbArtifact'] . ">" . $rr['tbArtifactDescription'] . "</option>";
+            $Sql = "SELECT * FROM tbartifact WHERE idtbartifact = " . $_GET['artifact'];
+			$rs = mysqli_query($conexao, $Sql);
+            while ($row = mysqli_fetch_array($rs, MYSQL_ASSOC)) {
+                echo "<option value=" . $row['idtbArtifact'] . ">" . $row['tbArtifactDescription'] . "</option>";
             }
             echo '</select>';
 
             echo '<select name="sel_criterion" id="criterion" class="form-control">';
-            $Sql = mysql_query("SELECT * FROM `tbCriterion` WHERE idtbCriterion = " . $_GET['artifact']);
-            while ($rr = mysql_fetch_array($Sql)) {
-                echo "<option value=" . $rr['idtbCriterion'] . ">" . $rr['tbCriterionDesc'] . "</option>";
+            $Sql = "SELECT * FROM `tbcriterion` WHERE idtbcriterion = " . $_GET['artifact'];
+			$rs = mysqli_query($conexao, $Sql);
+            while ($row = mysqli_fetch_array($rs, MYSQL_ASSOC)) {
+                echo "<option value=" . $row['idtbCriterion'] . ">" . $row['tbCriterionDesc'] . "</option>";
             }
             echo '</select>';
             
             echo '<select name="sel_subcriterion" id="subcriterion" class="form-control">';
-            $Sql = mysql_query("SELECT * FROM `tbsubcriterion` WHERE `idtbSubCriterion` = " . $_GET['subcriterion']);
-            while ($rr = mysql_fetch_array($Sql)) {
-                echo "<option value=" . $rr['idtbSubcriterion'] . ">" . $rr['tbSubCriterionDesc'] . "</option>";
+            $Sql = "SELECT * FROM `tbsubcriterion` WHERE `idtbsubcriterion` = " . $_GET['subcriterion'];
+			$rs = mysqli_query($conexao, $Sql);
+            while ($row = mysqli_fetch_array($rs, MYSQL_ASSOC)) {
+                echo "<option value=" . $row['idtbSubcriterion'] . ">" . $row['tbSubCriterionDesc'] . "</option>";
             }
             echo '</select>';
 

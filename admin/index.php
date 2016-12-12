@@ -9,8 +9,9 @@
         <title>SEWebS</title>
 </head>
 <?php
-
- 	header('Location:listaquestao.php');
+	
+	echo "<script> window.location.assign('listaquestao.php')</script>";
+ 	//header('Location:listaquestao.php');
 
 ?>
 

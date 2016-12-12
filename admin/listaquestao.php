@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+        <meta content="text/html; charset=utf-8" http-equiv="content-type" />
         <!-- <link rel="stylesheet" href="estilo.css" type="text/css" media="screen" /> -->
         <link href="../css/bootstrap.min.css" rel="stylesheet">
         <link href="../css/style.css" rel="stylesheet">
@@ -59,9 +59,9 @@ if (isset($_GET["submitlistar"])) {
 
 
 $Sql = "SELECT * FROM `tbuserquestion` ".$list;
-$rs = mysql_query($Sql, $conexao) or die ("Erro na pesquisa");
+$rs = mysqli_query($conexao, $Sql) or die ("Erro na pesquisa");
 
-		while($linha = mysql_fetch_array($rs)) {
+		while($linha = mysqli_fetch_array($rs, MYSQLI_ASSOC)) {
 			$id=$linha["idtbUserQuestion"];
 			$artifact=$linha["tbArtifact_idtbArtifact"];
 			$criterion=$linha["tbCriterion_idtbCriterion"];
@@ -74,40 +74,40 @@ $rs = mysql_query($Sql, $conexao) or die ("Erro na pesquisa");
 			echo  "<tr>";
 			echo    "<td>".$id."</td>";
 			echo    '<td>';
-			echo '<form method="get" target="_blank" action="editarelacaoquestao.php" class="form form-inline">';
+			echo '<form method="get" action="editarelacaoquestao.php" class="form form-inline">';
 			
 			$Sql2 = "SELECT * FROM `tbusertype`";
 			echo '<select name="sel_user" id="user" class="form-control" style="width: 35%">';
 			echo '<option value="">Avaliador</option>';
-			$rs2 = mysql_query($Sql2, $conexao) or die ("Erro na pesquisa");
-			while ($linha2 =  mysql_fetch_array($rs2)){ 
+			$rs2 = mysqli_query($conexao, $Sql2) or die ("Erro na pesquisa");
+			while ($linha2 =  mysqli_fetch_array($rs2, MYSQLI_ASSOC)){ 
 				echo "<option value=" . $linha2['idtbUserType'] . ">" . $linha2['tbUserTypeDescripton'] . "</option>";
 			}
 			echo '</select>';
 			
 			echo '<input name="txt_question" value="'.$id.'" size="12" type="text" hidden/>';
 			
-			$Sql2 = "SELECT * FROM `tbObjectives`";
+			$Sql2 = "SELECT * FROM `tbobjectives`";
 			echo '<select name="sel_objective" id="objective" class="form-control" style="width: 35%">';
 			echo '<option value="">Objetivo</option>';
-			$rs2 = mysql_query($Sql2, $conexao) or die ("Erro na pesquisa");
-			while ($linha2 =  mysql_fetch_array($rs2)){ 
+			$rs2 = mysqli_query($conexao, $Sql2) or die ("Erro na pesquisa");
+			while ($linha2 =  mysqli_fetch_array($rs2, MYSQLI_ASSOC)){ 
 				echo "<option value=".$linha2['idtbObjectives'].">".$linha2['tbObjectivesDesc']."</option>";
 			}
 			echo '</select>';
 			echo '<input name="txt_weight" value="1.00" size="1" type="text" class="form-control"/>';
-			echo '<button type="submit" name="submitRelationDel" onClick="window.location.reload()"><span class="glyphicon glyphicon-minus-sign"></span></button>';
-			echo '<button type="submit" name="submitRelationAdd" onClick="window.location.reload()"><span class="glyphicon glyphicon-plus-sign"></span></button></form>';
+			echo '<button type="submit" name="submitRelationDel"><span class="glyphicon glyphicon-minus-sign"></span></button>';
+			echo '<button type="submit" name="submitRelationAdd"><span class="glyphicon glyphicon-plus-sign"></span></button></form>';
 			
 			echo '<small>';
 			$Sql2 = "SELECT * FROM `tbusertype`";
-			$rs2 = mysql_query($Sql2, $conexao) or die ("Erro na pesquisa");
-			while ($linha2 =  mysql_fetch_array($rs2)){ 
+			$rs2 = mysqli_query($conexao, $Sql2) or die ("Erro na pesquisa");
+			while ($linha2 =  mysqli_fetch_array($rs2, MYSQLI_ASSOC)){ 
 				echo "<strong>".$linha2['tbUserTypeDescripton']. ":</strong> ";
 				$Sql3 = "SELECT * FROM tbobjectives_has_tbuserquestion INNER JOIN tbobjectives ON tbobjectives_has_tbuserquestion.tbObjectives_idtbObjectives = tbobjectives.idtbObjectives WHERE tbobjectives_has_tbuserquestion.tbUserType_idtbUserType = ".$linha2['idtbUserType']." AND tbobjectives_has_tbuserquestion.tbUserQuestion_idtbUserQuestion = ".$id;
 				//echo $Sql3;
-				$rs3 = mysql_query($Sql3, $conexao) or die ("Erro na pesquisa");
-				while ($linha3 =  mysql_fetch_array($rs3)){ 
+				$rs3 = mysqli_query($conexao, $Sql3) or die ("Erro na pesquisa");
+				while ($linha3 =  mysqli_fetch_array($rs3, MYSQLI_ASSOC)){ 
 					echo $linha3['tbObjectivesDesc']."(".$linha3['tbObjectives_has_tbUserWeight'].");";
 				}
 				echo ".<br>";
@@ -116,21 +116,21 @@ $rs = mysql_query($Sql, $conexao) or die ("Erro na pesquisa");
 			echo "</td>";
 
 			echo    "<td>";			
-			$Sql2 = "SELECT * FROM `tbArtifact` WHERE `idtbArtifact` = ".$artifact;
-			$rs2 = mysql_query($Sql2, $conexao) or die ("Erro na pesquisa");
-			while ($linha2 =  mysql_fetch_array($rs2)){ echo $linha2["tbArtifactDescription"]; }			
+			$Sql2 = "SELECT * FROM tbartifact WHERE idtbartifact = ".$artifact;
+			$rs2 = mysqli_query($conexao, $Sql2) or die ("Erro na pesquisa");
+			while ($linha2 =  mysqli_fetch_array($rs2, MYSQLI_ASSOC)){ echo $linha2["tbArtifactDescription"]; }			
 			echo "</td>";
 			
 			echo    "<td>";			
-			$Sql2 = "SELECT * FROM `tbCriterion` WHERE `idtbCriterion` = ".$criterion;
-			$rs2 = mysql_query($Sql2, $conexao) or die ("Erro na pesquisa");
-			while ($linha2 =  mysql_fetch_array($rs2)){ echo $linha2["tbCriterionDesc"]; }			
+			$Sql2 = "SELECT * FROM tbcriterion WHERE idtbcriterion = ".$criterion;
+			$rs2 = mysqli_query($conexao, $Sql2) or die ("Erro na pesquisa");
+			while ($linha2 =  mysqli_fetch_array($rs2, MYSQLI_ASSOC)){ echo $linha2["tbCriterionDesc"]; }			
 			echo "</td>";
 			
 			echo    "<td>";			
-			$Sql2 = "SELECT * FROM `tbSubCriterion` WHERE `idtbSubCriterion` = ".$subcriterion;
-			$rs2 = mysql_query($Sql2, $conexao) or die ("Erro na pesquisa");
-			while ($linha2 =  mysql_fetch_array($rs2)){ echo $linha2["tbSubCriterionDesc"]; }			
+			$Sql2 = "SELECT * FROM tbsubcriterion WHERE idtbsubcriterion = ".$subcriterion;
+			$rs2 = mysqli_query($conexao, $Sql2) or die ("Erro na pesquisa");
+			while ($linha2 =  mysqli_fetch_array($rs2, MYSQLI_ASSOC)){ echo $linha2["tbSubCriterionDesc"]; }			
 			echo "</td>";
 
 			
@@ -143,7 +143,6 @@ $rs = mysql_query($Sql, $conexao) or die ("Erro na pesquisa");
 			}
 ?>
 </table>
-<form method="get" target="_blank" action="editarelacaoquestao.php" class="form form-horizontal">
 </body>
 
 </html>

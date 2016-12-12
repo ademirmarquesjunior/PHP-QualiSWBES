@@ -1,3 +1,4 @@
+<?php session_start(); ?>
 <!DOCTYPE html>
 <html>
 
@@ -37,10 +38,10 @@
                 $aplic = $_POST['txt_aplic'];
                 //$aplic_desc = $_POST['txt_aplic_desc'];
 
-                $Sql = "SELECT * FROM `tbapplication` WHERE `tbApplicationName` = '" . $aplic . "'";
-                $rs = mysql_query($Sql, $conexao) or die("Erro busca aplicação");
+                $Sql = "SELECT * FROM tbapplication WHERE tbapplicationname = '" . $aplic . "'";
+                $rs = mysqli_query($conexao, $Sql) or die("Erro busca aplicação");
 
-                $linha = mysql_fetch_array($rs);
+                $linha = mysqli_fetch_array($rs, MYSQLI_ASSOC);
                 $applic_id = $linha["idtbApplication"];
 
 
@@ -48,18 +49,18 @@
                     //Trocar confirm() por equivalente em 'SweetAlert'
                     echo "<script language='javascript' type='text/javascript'> if(!confirm('Já existe uma aplicação com esse nome. Deseja avaliar a aplicação encontrada?')) {window.location.href='index2.php'; } </script>";
 
-                    $linha = mysql_fetch_array($rs);
+                    $linha = mysqli_fetch_array($rs, MYSQLI_ASSOC);
                     $applic_id = $linha["idtbApplication"];
                     $_SESSION['appic_id'] = $applic_id;
                 } else {
                     $Sql2 = "INSERT INTO `tbapplication` (`idtbApplication`, `tbApplicationName`, `tbApplicationDescription`) VALUES (NULL, '" . $aplic . "', '" . $aplic_desc . "')";
-                    $rs2 = mysql_query($Sql2, $conexao) or die("Erro insere aplicação");
+                    $rs2 = mysqli_query($conexao, $Sql2) or die ("Erro insere aplicação");
 
                     //obter o id da aplicação inserida. Mudar essa sessão por uma função do mysql para obter autoincrement
                     if ($rs2) {
                         $Sql = "SELECT * FROM `tbapplication` WHERE `tbApplicationName` = '" . $aplic . "'";
-                        $rs = mysql_query($Sql, $conexao) or die("Erro busca id aplicação");
-                        $linha2 = mysql_fetch_array($rs);
+                        $rs = mysqli_query($conexao, $Sql) or die("Erro busca id aplicação");
+                        $linha2 = mysqli_fetch_array($rs, MYSQLI_ASSOC);
                         $applic_id = $linha2["idtbApplication"];
                         $_SESSION['appic_id'] = $applic_id;
                     }
@@ -73,26 +74,27 @@
 
             if (isset($_SESSION['appic_id'])) {
                 //inserir um novo formulário em tbform
-                $Sql2 = "SELECT * FROM `tbform` WHERE `tbApplication_idtbApplication` = '" . $applic_id . "' AND `tbUser_idtbUser` = '" . $user . "'";
-                $rs2 = mysql_query($Sql2, $conexao);
-                $linha = mysql_fetch_array($rs2);
+                $Sql2 = "SELECT * FROM tbform WHERE tbapplication_idtbapplication = '" . $applic_id . "' AND tbuser_idtbUser = '" . $user . "'";
+                $rs2 = mysqli_query($conexao, $Sql2);
+                $linha = mysqli_fetch_array($rs2, MYSQLI_ASSOC);
                 $form = $linha["idtbForm"];
                 print_r($form);
                 
                 if ($form == '') {
-	                $Sql = "INSERT INTO `tbform` (`idtbForm`, `tbApplication_idtbApplication`, `tbUser_idtbUser`) VALUES (NULL, '" . $applic_id . "', '" . $user . "')";
-	                $rs = mysql_query($Sql, $conexao);
+	                $Sql = "INSERT INTO `tbform` (`idtbform`, `tbapplication_idtbapplication`, `tbuser_idtbuser`) VALUES (NULL, '" . $applic_id . "', '" . $user . "')";
+	                $rs = mysqli_query($conexao, $Sql);
 	                
 	                
 	
 	                //obter o id do form inserido
 	                if ($rs) {
-	                    $Sql2 = "SELECT * FROM `tbform` WHERE `tbApplication_idtbApplication` = '" . $applic_id . "' AND `tbUser_idtbUser` = '" . $user . "'";
-	                    $rs2 = mysql_query($Sql2, $conexao) or die("Erro busca id formulário");
-	                    $linha = mysql_fetch_array($rs2);
+	                    $Sql2 = "SELECT * FROM `tbform` WHERE `tbapplication_idtbapplication` = '" . $applic_id . "' AND `tbuser_idtbuser` = '" . $user . "'";
+	                    $rs2 = mysqli_query($conexao, $Sql) or die("Erro busca id formulário");
+	                    $linha = mysqli_fetch_array($rs2, MYSQLI_ASSOC);
 	                    $form_id = $linha["idtbForm"];
 	                    $_SESSION['form_id'] = $form_id;
-	                    header('Location:form.php');
+	                    //echo "<script> window.location.assign('form.php')</script>";
+	                    //header('Location:form.php');
 	                }
                 }
             }
@@ -110,11 +112,11 @@
             <form action="index2.php" class="form-group" method="post" name="form2">
                 <p><label>Nome da aplicação</label></p>
                 <p><select id="aplication" class="form-control" name="sel_aplic">
-                        <option value="">Escolha uma das opções</option>
-<?php $Sql = mysql_query("SELECT * FROM tbapplication INNER JOIN tbform ON tbapplication.idtbApplication = tbform.tbApplication_idtbApplication WHERE tbform.tbUser_idtbUser != ".$_SESSION['user_id']);
-while ($rr = mysql_fetch_array($Sql)) {
-    echo "<option value=" . $rr['idtbApplication'] . ">" . $rr['tbApplicationName'] . "</option>";
-} ?>
+                	<option value="">Escolha uma das opções</option>
+					<?php $Sql = mysql_query("SELECT * FROM tbapplication INNER JOIN tbform ON tbapplication.idtbApplication = tbform.tbApplication_idtbApplication WHERE tbform.tbUser_idtbUser != ".$_SESSION['user_id']);
+					while ($rr = mysql_fetch_array($Sql)) {
+					    echo "<option value=" . $rr['idtbApplication'] . ">" . $rr['tbApplicationName'] . "</option>";
+					} ?>
                     </select> </p>
                 <p>
                     <input class="btn btn-default" type="submit" value="Iniciar avaliação" /></p>
@@ -126,9 +128,10 @@ while ($rr = mysql_fetch_array($Sql)) {
             <h3>Minhas avaliações concluídas</h3>
             <?php
             $i = 0;
-            $Sql = mysql_query("SELECT * FROM tbform INNER JOIN tbapplication ON tbapplication.idtbApplication = tbform.tbApplication_idtbApplication WHERE tbform.tbformCompleted = 1 AND tbform.tbUser_idtbUser = " . $_SESSION['user_id']);
-            while ($rr = mysql_fetch_array($Sql)) {
-                echo "<span class='glyphicon glyphicon-check'></span><a href='results.php?form=" . $rr['idtbForm'] . "'>" . $rr['tbApplicationName'] . "</a><br>";
+            $Sql = "SELECT * FROM tbform INNER JOIN tbapplication ON tbapplication.idtbApplication = tbform.tbApplication_idtbApplication WHERE tbform.tbformCompleted = 1 AND tbform.tbUser_idtbUser = " . $_SESSION['user_id'];
+            $rs = mysqli_query($conexao, $Sql);
+            while ($linha = mysqli_fetch_array($rs, MYSQLI_ASSOC)) {
+                echo "<span class='glyphicon glyphicon-check'></span><a href='results.php?form=" . $linha['idtbForm'] . "'>" . $linha['tbApplicationName'] . "</a><br>";
  				$i++;
            }
             if ($i == 0) echo "Não há avaliações concluídas<br>";
@@ -141,9 +144,11 @@ while ($rr = mysql_fetch_array($Sql)) {
             <h3>Avaliações pendentes</h3>
             <?php
             $i = 0;
-            $Sql = mysql_query("SELECT * FROM tbform INNER JOIN tbapplication ON tbapplication.idtbApplication = tbform.tbApplication_idtbApplication WHERE tbform.tbformCompleted = 0 AND tbform.tbUser_idtbUser = " . $_SESSION['user_id']);
-            while ($rr = mysql_fetch_array($Sql)) {
-                echo "<span class='glyphicon glyphicon-expand'></span><a href='results.php?form=" . $rr['idtbForm'] . "'>" . $rr['tbApplicationName'] . "</a><br>";
+            $Sql = "SELECT * FROM tbform INNER JOIN tbapplication ON tbapplication.idtbApplication = tbform.tbApplication_idtbApplication WHERE tbform.tbformCompleted = 0 AND tbform.tbUser_idtbUser = " . $_SESSION['user_id'];
+            $rs = mysqli_query($conexao, $Sql);
+            
+            while ($linha = mysqli_fetch_array($rs, MYSQLI_ASSOC)) {
+                echo "<span class='glyphicon glyphicon-expand'></span><a href='results.php?form=" . $linha['idtbForm'] . "'>" . $linha['tbApplicationName'] . "</a><br>";
                 $i++;
             }
             if ($i == 0) echo "Não há nenhuma avaliação pendente<br>";

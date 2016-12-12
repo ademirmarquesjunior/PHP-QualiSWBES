@@ -12,9 +12,9 @@ function extraiResultados ($form, $objective) {
     if ($form != '') {
         //$Sql = "SELECT * FROM `tbform_has_tbuserquestion` WHERE `tbForm_idtbForm` = " . $form;
         $Sql = "SELECT * FROM tbuserquestion INNER JOIN tbobjectives_has_tbuserquestion on tbuserquestion.idtbUserQuestion = tbobjectives_has_tbuserquestion.tbUserQuestion_idtbUserQuestion INNER JOIN tbform_has_tbuserquestion ON tbuserquestion.idtbUserQuestion = tbform_has_tbuserquestion.tbUserQuestion_idtbUserQuestion WHERE tbform_has_tbuserquestion.tbForm_idtbForm = ".$form." AND tbobjectives_has_tbuserquestion.tbObjectives_idtbObjectives = ".$objective;
-        $rs = mysql_query($Sql, $conexao) or die("Formulário não existe");
+        $rs = mysqli_query($conexao, $Sql) or die("Formulário não existe");
 
-        while ($linha = mysql_fetch_array($rs)) {
+        while ($linha = mysqli_fetch_array($rs, MYSQLI_ASSOC)) {
             $total = $total + $linha["tbForm_has_tbUserQuestionAnswer"]*$linha["tbObjectives_has_tbUserWeight"];
             $total_weight = $total_weight + $linha["tbObjectives_has_tbUserWeight"];
             $counter++;
@@ -29,7 +29,7 @@ function extraiResultados ($form, $objective) {
         }
      }
         
-        return array($sum, $sum_weight, $total, $total_weight, $counter);
+     return array($sum, $sum_weight, $total, $total_weight, $counter);
 }
 
 function detalhaResultados ($resultados) {
@@ -56,10 +56,11 @@ function detalhaResultados ($resultados) {
     		
     		//echo "...".$j."<br>";
     		foreach ($valuecriterion as $k=>$valuesubcriterion) {
-    			$Sql = mysql_query("SELECT * FROM `tbSubCriterion` WHERE idtbSubCriterion = ".$k);
-            	while ($rr = mysql_fetch_array($Sql)) {
+    			$Sql = "SELECT * FROM `tbSubCriterion` WHERE idtbSubCriterion = ".$k;
+    			$rs = mysqli_query($conexao, $Sql);
+            	while ($linha = mysqli_fetch_array($rs, MYSQLI_ASSOC)) {
             		//echo $rr['tbSubCriterionDesc']." "; 
-            		$subcriterion = $rr['tbSubCriterionDesc'];
+            		$subcriterion = $linha['tbSubCriterionDesc'];
 				}  
     		
     			if ($sum_weight[$i][$j][$k] != 0) {
@@ -73,10 +74,11 @@ function detalhaResultados ($resultados) {
 		
 
 			
-        	$Sql = mysql_query("SELECT * FROM `tbCriterion` WHERE idtbCriterion = ".$j);
-            	while ($rr = mysql_fetch_array($Sql)) {
+        	$Sql = "SELECT * FROM `tbCriterion` WHERE idtbCriterion = ".$j;
+        	$rs = mysqli_query($conexao, $Sql);
+            	while ($linha = mysqli_fetch_array($rs, MYSQLI_ASSOC)) {
             		//echo "<strong>".$rr['tbCriterionDesc']."</strong> "; 
-            		$criterion = $rr['tbCriterionDesc'];
+            		$criterion = $linha['tbCriterionDesc'];
 			}
 			if ($criterion_weight != 0){
 				$result = $criterion_sum/$criterion_weight*20;
@@ -91,10 +93,11 @@ function detalhaResultados ($resultados) {
 		}
 		
 		
-    	$Sql = mysql_query("SELECT * FROM `tbArtifact` WHERE idtbArtifact = ".$i);
-        	while ($rr = mysql_fetch_array($Sql)) {
+    	$Sql = "SELECT * FROM `tbArtifact` WHERE idtbArtifact = ".$i;
+    	$rs = mysqli_query($conexao, $Sql);
+       	while ($linha = mysqli_fetch_array($rs, MYSQLI_ASSOC)) {
         		//echo "<strong>".$rr['tbArtifactDescription']."</strong> ";
-        		$artifact = $rr['tbArtifactDescription'];
+        		$artifact = $linha['tbArtifactDescription'];
         } 
 		if ($artifact_weight != 0) {
 			$result = $artifact_sum/$artifact_weight*20;

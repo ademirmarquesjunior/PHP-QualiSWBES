@@ -1,3 +1,4 @@
+<?php session_start(); ?>
 <!DOCTYPE html>
 <html>
 <head>
@@ -15,12 +16,13 @@
 <body>
 
 <?php
-session_start();
+//session_start();
 if(isset($_SESSION['user_login'])) {
 //echo "Usuário '".$_SESSION['user_login']."' ";
 session_destroy();
 //echo "<script language='javascript' type='text/javascript'> swal('Você saiu!'); window.location.href='index.php'; </script>";
-header('Location:index.php');
+echo "<script> window.location.assign('index.php')</script>";
+//header('Location:index.php');
 } 
 ?>
 

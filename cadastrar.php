@@ -1,3 +1,4 @@
+<?php session_start(); ?>
 <!DOCTYPE html>
 
 <head>
@@ -19,7 +20,6 @@
         <div id="login" class="well well-sm">
             <?php
 //include("valida.php");
-			session_start();
             echo 'Bem vindo visitante';
 			if (isset($_SESSION['user_login'])) {
 				echo '1';

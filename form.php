@@ -1,3 +1,4 @@
+<?php session_start(); ?>
 <!DOCTYPE html>
 <html>
 
@@ -35,8 +36,20 @@
                 <div class="panel panel-default">
                     <div class="panel-body">
                         <h1>Questionário</h1>
-                        Você está avaliando <strong>'<?php $Sql = mysql_query("SELECT * FROM `tbapplication` WHERE `idtbapplication` = ".$_SESSION['appic_id']); while ($rr = mysql_fetch_array($Sql)) { echo $rr['tbApplicationName']; } ?></strong>'
-                         como <strong>'<?php $Sql = mysql_query("SELECT * FROM `tbUserType` WHERE `idtbUserType` = ".$_SESSION['user_type']); while ($rr = mysql_fetch_array($Sql)) { echo $rr['tbUserTypeDescripton']; } ?>'  
+                        Você está avaliando <strong>'
+                        <?php
+                        $Sql = "SELECT * FROM `tbapplication` WHERE `idtbapplication` = ".$_SESSION['appic_id'];
+                        $rs = mysqli_query($conexao,$Sql);
+                        while ($linha = mysqli_fetch_array($rs, MYSQLI_ASSOC)) {
+                        	echo $linha['tbApplicationName']; 
+                        } ?> </strong>'como 
+                        <strong>'
+                        <?php 
+                        $Sql = "SELECT * FROM `tbusertype` WHERE `idtbusertype` = ".$_SESSION['user_type'];
+                        $rs = mysqli_query($conexao,$Sql);
+                        while ($row = mysqli_fetch_array($rs, MYSQLI_ASSOC)) {
+                        	echo $row['tbUserTypeDescripton']; 
+                        } ?>'  
 						</strong>  
 					</div>
                	 </div>
@@ -52,25 +65,25 @@
                             echo "<p>" . $_SESSION['form_id'] . "</p>";
 
                             $Sql = "INSERT INTO `tbform_has_tbuserquestion` (`tbForm_idtbForm`, `tbUserQuestion_idtbUserQuestion`, `tbForm_has_tbUserQuestionAnswer`) VALUES ('" . $_SESSION['form_id'] . "', '" . $key . "', '" . $value . "')";
-                            $rs = mysql_query($Sql, $conexao) or die("Erro insere formulário");
+                            $rs = mysqli_query($conexao, $Sql) or die("Erro insere formulário");
                             $inserted = 1;
                         }
 
                         if ($inserted == 1) {
                         	$Sql = "UPDATE `tbform` SET `tbformCompleted` = '1' WHERE `tbform`.`idtbForm` = ".$_SESSION['form_id']." AND `tbform`.`tbApplication_idtbApplication` = ".$_SESSION['appic_id']." AND `tbform`.`tbUser_idtbUser` = ".$_SESSION['user_id']."";
-                            $rs = mysql_query($Sql, $conexao) or die("Erro completa formulário");
-                            header('Location:results.php?form=' . $_SESSION['form_id']);
+                            $rs = mysqli_query($conexao, $Sql) or die("Erro completa formulário");
+                            echo "<script> window.location.assign('results.php?form=".$_SESSION['form_id']."')</script>";
+                            //header('Location:results.php?form=' . $_SESSION['form_id']);
                         }
 
                         $order = "ORDER BY tbArtifact_idtbArtifact";
                         $artifact_change = '';
 
-//$Sql = "SELECT * FROM `tbuserquestion` WHERE tbusertype_idtbUsertype = '".$_SESSION['user_type']."' ".$order;
+						//$Sql = "SELECT * FROM `tbuserquestion` WHERE tbusertype_idtbUsertype = '".$_SESSION['user_type']."' ".$order;
                         $Sql = "SELECT * FROM tbuserquestion INNER JOIN tbobjectives_has_tbuserquestion ON tbuserquestion.idtbUserQuestion = tbobjectives_has_tbuserquestion.tbUserQuestion_idtbUserQuestion WHERE tbobjectives_has_tbuserquestion.tbUserType_idtbUserType =  ".$_SESSION['user_type']." ".$order;
-                        //echo $Sql;
-                        $rs = mysql_query($Sql, $conexao) or die("Erro na pesquisa");
+                        $rs = mysqli_query($conexao, $Sql) or die("Erro na pesquisa");
 
-                        while ($linha = mysql_fetch_array($rs)) {
+                        while ($linha = mysqli_fetch_array($rs, MYSQL_ASSOC)) {
                             $id = $linha["idtbUserQuestion"];
                             $artifact = $linha["tbArtifact_idtbArtifact"];
                             $criterion = $linha["tbCriterion_idtbCriterion"];
@@ -78,9 +91,9 @@
                             $howto = $linha["tbUserQuestionHowTo"];
 
                             if ($artifact_change != $artifact) {
-                                $Sql2 = "SELECT * FROM `tbArtifact` WHERE `idtbArtifact` = '" . $artifact . "'";
-                                $rs2 = mysql_query($Sql2, $conexao) or die("Erro na pesquisa");
-                                while ($linha2 = mysql_fetch_array($rs2)) {
+                                $Sql2 = "SELECT * FROM `tbartifact` WHERE `idtbartifact` = '" . $artifact . "'";
+                                $rs2 = mysqli_query($conexao,$Sql2) or die("Erro na pesquisa");
+                                while ($linha2 = mysqli_fetch_array($rs2, MYSQLI_ASSOC)) {
                                     echo '<div class="panel panel-default"><div class="panel-body"><h2>';
                                     echo $linha2['tbArtifactDescription'];
                                     echo '</h2></div></div>';
@@ -99,14 +112,13 @@
                             echo "<div class='radio'><label><input type='radio' name=" . $id . " value='5' class='optradio' />5</label></div>";
                             echo "<hr>";
                         }
-                        ?><input class="btn btn-default" type="submit" value="Salvar" /> </div>
+                        ?><input class="btn btn-default" type="submit" value="Salvar" />
+					</div>
                 </div>
             </form>
-        </div>
-    </div>
-    <div id="footer" class="well well-sm">
-        Desenvolvimento: Ademir Marques Junior - 2016 </div>
-</div>
+			<div id="footer" class="well well-sm">
+				Desenvolvimento: Ademir Marques Junior - 2016 </div>
+		</div>
 <script>
          window.onload = function(){
     		swal("Neste aviso estará um pequeno texto explicando sobre o que será avaliado em geral, destacando que os objetos avaliados dependem do tipo de avaliador que está usando o sistema de avaliação.");
