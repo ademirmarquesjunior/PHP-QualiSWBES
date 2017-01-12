@@ -141,6 +141,7 @@
                        <div class="row">
                              <?php
                                 for ($i = 1; $i < 5; $i++) {
+									if ($values[$i-1] != 0) {
                                     $artifact_value = $resultados_exp[$i][0];
                                     $artifact_name = $resultados_exp[$i][1];
                                     echo ' <div class="col-md-6"><div class="panel panel-default"><div class="panel-body">
@@ -181,8 +182,9 @@
                                     $loadgraph = $loadgraph . 'var ctx' . $i . ' = document.getElementById("GraficoArtefato' . $i . '").getContext("2d");
                  var BarChart' . $i . ' = new Chart(ctx' . $i . ').Bar(data' . $i . ', options' . $i . ');';
                  
-                 			echo '</div></div></div>';
-                                }
+									echo '</div></div></div>';
+									}
+								}
                                 ?>
                         </div>
                         <div id="footer" class="well well-sm">

@@ -78,6 +78,7 @@
 
                         $order = "ORDER BY tbArtifact_idtbArtifact";
                         $artifact_change = '';
+						$id_change = '';
 
 						//$Sql = "SELECT * FROM `tbuserquestion` WHERE tbusertype_idtbUsertype = '".$_SESSION['user_type']."' ".$order;
                         $Sql = "SELECT * FROM tbuserquestion INNER JOIN tbobjectives_has_tbuserquestion ON tbuserquestion.idtbUserQuestion = tbobjectives_has_tbuserquestion.tbUserQuestion_idtbUserQuestion WHERE tbobjectives_has_tbuserquestion.tbUserType_idtbUserType =  ".$_SESSION['user_type']." ".$order;
@@ -89,6 +90,8 @@
                             $criterion = $linha["tbCriterion_idtbCriterion"];
                             $question = $linha["tbUserQuestionText"];
                             $howto = $linha["tbUserQuestionHowTo"];
+							
+							if ($id != $id_change) {
 
                             if ($artifact_change != $artifact) {
                                 $Sql2 = "SELECT * FROM `tbartifact` WHERE `idtbartifact` = '" . $artifact . "'";
@@ -100,7 +103,7 @@
                                     $artifact_change = $artifact;
                                 }
                             }
-
+				
 
                             echo "<h4 id='question'>" . $question . "</h4>";
                             echo "<h5 id='howto'>" . $howto . "</h5>";
@@ -111,6 +114,8 @@
                             echo "<div class='radio'><label><input type='radio' name=" . $id . " value='4' class='optradio' />4</label></div>";
                             echo "<div class='radio'><label><input type='radio' name=" . $id . " value='5' class='optradio' />5</label></div>";
                             echo "<hr>";
+							$id_change = $id;
+							}
                         }
                         ?><input class="btn btn-default" type="submit" value="Salvar" />
 					</div>

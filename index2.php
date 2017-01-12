@@ -32,6 +32,9 @@
 
             $user = $_SESSION['user_id'];
             $type = $_SESSION['user_type'];
+			
+		if (isset($_POST['txt_aplic']) OR isset($_POST['sel_aplic'])) {
+			
             $applic_id = NULL;
 
             if ((isset($_POST['txt_aplic'])) AND ( $_POST['txt_aplic'] != '')) {
@@ -41,11 +44,14 @@
                 $Sql = "SELECT * FROM tbapplication WHERE tbapplicationname = '" . $aplic . "'";
                 $rs = mysqli_query($conexao, $Sql) or die("Erro busca aplicação");
 
-                $linha = mysqli_fetch_array($rs, MYSQLI_ASSOC);
-                $applic_id = $linha["idtbApplication"];
+                $i = 0;
+				while ($linha = mysqli_fetch_array($rs, MYSQLI_ASSOC)) {
+            		$i++;
+				}
+                //$applic_id = $linha["idtbApplication"];
+				
 
-
-                if ($linha) {
+                if ($i) {
                     //Trocar confirm() por equivalente em 'SweetAlert'
                     echo "<script language='javascript' type='text/javascript'> if(!confirm('Já existe uma aplicação com esse nome. Deseja avaliar a aplicação encontrada?')) {window.location.href='index2.php'; } </script>";
 
@@ -58,10 +64,10 @@
 
                     //obter o id da aplicação inserida. Mudar essa sessão por uma função do mysql para obter autoincrement
                     if ($rs2) {
-                        $Sql = "SELECT * FROM `tbapplication` WHERE `tbApplicationName` = '" . $aplic . "'";
-                        $rs = mysqli_query($conexao, $Sql) or die("Erro busca id aplicação");
-                        $linha2 = mysqli_fetch_array($rs, MYSQLI_ASSOC);
-                        $applic_id = $linha2["idtbApplication"];
+                        $Sql3 = "SELECT * FROM `tbapplication` WHERE `tbApplicationName` = '" . $aplic . "'";
+                        $rs3 = mysqli_query($conexao, $Sql3) or die("Erro busca id aplicação");
+                        $linha3 = mysqli_fetch_array($rs3, MYSQLI_ASSOC);
+                        $applic_id = $linha3["idtbApplication"];
                         $_SESSION['appic_id'] = $applic_id;
                     }
                 }
@@ -74,30 +80,31 @@
 
             if (isset($_SESSION['appic_id'])) {
                 //inserir um novo formulário em tbform
-                $Sql2 = "SELECT * FROM tbform WHERE tbapplication_idtbapplication = '" . $applic_id . "' AND tbuser_idtbUser = '" . $user . "'";
-                $rs2 = mysqli_query($conexao, $Sql2);
-                $linha = mysqli_fetch_array($rs2, MYSQLI_ASSOC);
+                $Sql = "SELECT * FROM tbform WHERE tbapplication_idtbapplication = '" . $applic_id . "' AND tbuser_idtbUser = '" . $user . "'";
+                $rs = mysqli_query($conexao, $Sql);
+                $linha = mysqli_fetch_array($rs, MYSQLI_ASSOC);
                 $form = $linha["idtbForm"];
                 print_r($form);
                 
                 if ($form == '') {
-	                $Sql = "INSERT INTO `tbform` (`idtbform`, `tbapplication_idtbapplication`, `tbuser_idtbuser`) VALUES (NULL, '" . $applic_id . "', '" . $user . "')";
-	                $rs = mysqli_query($conexao, $Sql);
+	                $Sql2 = "INSERT INTO `tbform` (`idtbform`, `tbapplication_idtbapplication`, `tbuser_idtbuser`) VALUES (NULL, '" . $applic_id . "', '" . $user . "')";
+	                $rs2 = mysqli_query($conexao, $Sql2);
 	                
 	                
 	
 	                //obter o id do form inserido
 	                if ($rs) {
-	                    $Sql2 = "SELECT * FROM `tbform` WHERE `tbapplication_idtbapplication` = '" . $applic_id . "' AND `tbuser_idtbuser` = '" . $user . "'";
-	                    $rs2 = mysqli_query($conexao, $Sql) or die("Erro busca id formulário");
-	                    $linha = mysqli_fetch_array($rs2, MYSQLI_ASSOC);
-	                    $form_id = $linha["idtbForm"];
+	                    $Sql3 = "SELECT * FROM `tbform` WHERE `tbapplication_idtbapplication` = '" . $applic_id . "' AND `tbuser_idtbuser` = '" . $user . "'";
+	                    $rs3 = mysqli_query($conexao, $Sql3) or die("Erro busca id formulário");
+	                    $linha3 = mysqli_fetch_array($rs3, MYSQLI_ASSOC);
+	                    $form_id = $linha3["idtbForm"];
 	                    $_SESSION['form_id'] = $form_id;
-	                    //echo "<script> window.location.assign('form.php')</script>";
+	                    echo "<script> window.location.assign('form.php')</script>";
 	                    //header('Location:form.php');
 	                }
                 }
-            }
+			}		
+        }
             ?>
             <h3>Cadastrar uma nova aplicação e iniciar avaliação</h3>
             <form action="index2.php" class="form-group" method="post" name="form1">

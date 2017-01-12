@@ -56,7 +56,7 @@ function detalhaResultados ($resultados) {
     		
     		//echo "...".$j."<br>";
     		foreach ($valuecriterion as $k=>$valuesubcriterion) {
-    			$Sql = "SELECT * FROM `tbSubCriterion` WHERE idtbSubCriterion = ".$k;
+    			$Sql = "SELECT * FROM `tbsubcriterion` WHERE idtbSubCriterion = ".$k;
     			$rs = mysqli_query($conexao, $Sql);
             	while ($linha = mysqli_fetch_array($rs, MYSQLI_ASSOC)) {
             		//echo $rr['tbSubCriterionDesc']." "; 
@@ -74,7 +74,7 @@ function detalhaResultados ($resultados) {
 		
 
 			
-        	$Sql = "SELECT * FROM `tbCriterion` WHERE idtbCriterion = ".$j;
+        	$Sql = "SELECT * FROM `tbcriterion` WHERE idtbCriterion = ".$j;
         	$rs = mysqli_query($conexao, $Sql);
             	while ($linha = mysqli_fetch_array($rs, MYSQLI_ASSOC)) {
             		//echo "<strong>".$rr['tbCriterionDesc']."</strong> "; 
@@ -93,7 +93,7 @@ function detalhaResultados ($resultados) {
 		}
 		
 		
-    	$Sql = "SELECT * FROM `tbArtifact` WHERE idtbArtifact = ".$i;
+    	$Sql = "SELECT * FROM `tbartifact` WHERE idtbArtifact = ".$i;
     	$rs = mysqli_query($conexao, $Sql);
        	while ($linha = mysqli_fetch_array($rs, MYSQLI_ASSOC)) {
         		//echo "<strong>".$rr['tbArtifactDescription']."</strong> ";

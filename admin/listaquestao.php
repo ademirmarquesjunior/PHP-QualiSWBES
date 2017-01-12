@@ -17,8 +17,21 @@ include "conecta.php";
 </p>
 
 <form id="form2" name="form2" method="get" action="listaquestao.php" class="form-inline">
-<select name="sel_artifact" id="artifact" class="form-control"><option value="" selected>Artefato</option><?php $Sql = mysql_query("SELECT * FROM `tbArtifact`"); while ($rr = mysql_fetch_array($Sql)) { echo "<option value=".$rr['idtbArtifact'].">".$rr['tbArtifactDescription']."</option>"; } ?></select>
-<select name="sel_criterion" id="criterion"class="form-control"><option value="" selected>Critério</option><?php $Sql = mysql_query("SELECT * FROM `tbCriterion`"); while ($rr = mysql_fetch_array($Sql)) { echo "<option value=".$rr['idtbCriterion'].">".$rr['tbCriterionDesc']."</option>"; } ?></select>
+<select name="sel_artifact" id="artifact" class="form-control"><option value="" selected>Artefato</option>
+<?php
+$Sql = "SELECT * FROM `tbartifact`";
+$rs = mysqli_query($conexao, $Sql);
+while ($row = mysqli_fetch_array($rs, MYSQLI_ASSOC)) {
+	echo "<option value=".$row['idtbArtifact'].">".$row['tbArtifactDescription']."</option>";
+} ?></select>
+
+<select name="sel_criterion" id="criterion"class="form-control"><option value="" selected>Critério</option>
+<?php 
+$Sql = "SELECT * FROM `tbcriterion`";
+$rs = mysqli_query($conexao, $Sql);
+while ($row = mysqli_fetch_array($rs, MYSQLI_ASSOC)) {
+	echo "<option value=".$row['idtbCriterion'].">".$row['tbCriterionDesc']."</option>";
+} ?></select>
 <input type="submit" name="submitlistar" value="Listar" class="btn btn-default"/>
 </form>
 
@@ -48,11 +61,11 @@ if (isset($_GET["submitlistar"])) {
 	$criterion = $_GET['sel_criterion'];
 	
 	if ($artifact != "") {
-		$list = $list." AND tbArtifact_idtbArtifact = ".$artifact;
+		$list = $list." AND tbartifact_idtbartifact = ".$artifact;
 	}
 	
 	if ($criterion != "") {
-		$list = $list." AND tbCriterion_idtbCriterion = ".$criterion;
+		$list = $list." AND tbcriterion_idtbcriterion = ".$criterion;
 	}
 }
 
