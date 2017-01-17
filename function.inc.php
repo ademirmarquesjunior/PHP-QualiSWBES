@@ -19,13 +19,13 @@ function extraiResultados ($form, $objective) {
             $total_weight = $total_weight + $linha["tbObjectives_has_tbUserWeight"];
             $counter++;
             
-            if (!isset($sum[$linha["tbArtifact_idtbArtifact"]][$linha["tbCriterion_idtbCriterion"]][$linha["tbSubCriterion_idtbSubCriterion"]])){
-            	$sum[$linha["tbArtifact_idtbArtifact"]][$linha["tbCriterion_idtbCriterion"]][$linha["tbSubCriterion_idtbSubCriterion"]] = NULL;
-            	$sum_weight[$linha["tbArtifact_idtbArtifact"]][$linha["tbCriterion_idtbCriterion"]][$linha["tbSubCriterion_idtbSubCriterion"]] = NULL;
+            if (!isset($sum[$linha["tbArtifact_idtbArtifact"]][$linha["tbFactor_idtbFactor"]][$linha["tbSubFactor_idtbSubFactor"]])){
+            	$sum[$linha["tbArtifact_idtbArtifact"]][$linha["tbFactor_idtbFactor"]][$linha["tbSubFactor_idtbSubFactor"]] = NULL;
+            	$sum_weight[$linha["tbArtifact_idtbArtifact"]][$linha["tbFactor_idtbFactor"]][$linha["tbSubFactor_idtbSubFactor"]] = NULL;
             }
             
-            $sum[$linha["tbArtifact_idtbArtifact"]][$linha["tbCriterion_idtbCriterion"]][$linha["tbSubCriterion_idtbSubCriterion"]] = $sum[$linha["tbArtifact_idtbArtifact"]][$linha["tbCriterion_idtbCriterion"]][$linha["tbSubCriterion_idtbSubCriterion"]] + $linha["tbForm_has_tbUserQuestionAnswer"]*$linha["tbObjectives_has_tbUserWeight"];
-            $sum_weight[$linha["tbArtifact_idtbArtifact"]][$linha["tbCriterion_idtbCriterion"]][$linha["tbSubCriterion_idtbSubCriterion"]] = $sum_weight[$linha["tbArtifact_idtbArtifact"]][$linha["tbCriterion_idtbCriterion"]][$linha["tbSubCriterion_idtbSubCriterion"]] + $linha["tbObjectives_has_tbUserWeight"];
+            $sum[$linha["tbArtifact_idtbArtifact"]][$linha["tbFactor_idtbFactor"]][$linha["tbSubFactor_idtbSubFactor"]] = $sum[$linha["tbArtifact_idtbArtifact"]][$linha["tbFactor_idtbFactor"]][$linha["tbSubFactor_idtbSubFactor"]] + $linha["tbForm_has_tbUserQuestionAnswer"]*$linha["tbObjectives_has_tbUserWeight"];
+            $sum_weight[$linha["tbArtifact_idtbArtifact"]][$linha["tbFactor_idtbFactor"]][$linha["tbSubFactor_idtbSubFactor"]] = $sum_weight[$linha["tbArtifact_idtbArtifact"]][$linha["tbFactor_idtbFactor"]][$linha["tbSubFactor_idtbSubFactor"]] + $linha["tbObjectives_has_tbUserWeight"];
         }
      }
         
@@ -36,10 +36,10 @@ function detalhaResultados ($resultados) {
 	$sum = $resultados[0];
 	$sum_weight = $resultados[1];
 	
-	$subcriterion_value = array(array(array()));
-	$subcriterion_name = array(array(array()));	
-	$criterion_value = array(array());
-	$criterion_name = array(array());
+	$subFactor_value = array(array(array()));
+	$subFactor_name = array(array(array()));	
+	$Factor_value = array(array());
+	$Factor_name = array(array());
 	$artifac_value = array();
 	$artifact_name = array();
 	
@@ -50,54 +50,53 @@ function detalhaResultados ($resultados) {
     	$artifact_sum = 0;
     	$artifact_weight = 0;
 
-    	foreach ($valueartifact as $j=>$valuecriterion) {
-    		$criterion_sum = 0;
-    		$criterion_weight = 0;
+    	foreach ($valueartifact as $j=>$valueFactor) {
+    		$Factor_sum = 0;
+    		$Factor_weight = 0;
     		
     		//echo "...".$j."<br>";
-    		foreach ($valuecriterion as $k=>$valuesubcriterion) {
-    			$Sql = "SELECT * FROM `tbsubcriterion` WHERE idtbSubCriterion = ".$k;
+    		foreach ($valueFactor as $k=>$valuesubFactor) {
+    			$Sql = "SELECT * FROM `tbsubFactor` INNER JOIN tbSubFactorText ON tbSubFactor.idtbSubFactor = tbSubFactorText.tbsubfactor_idtbSubfactor  WHERE idtbSubFactor = ".$k." AND tblanguage_idtblanguage = ".$_SESSION['language'];
     			$rs = mysqli_query($conexao, $Sql);
             	while ($linha = mysqli_fetch_array($rs, MYSQLI_ASSOC)) {
-            		//echo $rr['tbSubCriterionDesc']." "; 
-            		$subcriterion = $linha['tbSubCriterionDesc'];
-				}  
+            		//echo $rr['tbSubFactorDesc']." "; 
+            		$subFactor = $linha['tbSubFactorName'];
+				}
     		
     			if ($sum_weight[$i][$j][$k] != 0) {
-	    			$result = $valuesubcriterion/$sum_weight[$i][$j][$k]*20;
-	    			$criterion_sum = $criterion_sum + $valuesubcriterion;
-	    			$criterion_weight = $criterion_weight + $sum_weight[$i][$j][$k];
-	    			$subcriterion_value[$i][$j][$k] = $result;
-	    			$subcriterion_name[$i][$j][$k] = $subcriterion;
+	    			$result = $valuesubFactor/$sum_weight[$i][$j][$k]*20;
+	    			$Factor_sum = $Factor_sum + $valuesubFactor;
+	    			$Factor_weight = $Factor_weight + $sum_weight[$i][$j][$k];
+	    			$subFactor_value[$i][$j][$k] = $result;
+	    			$subFactor_name[$i][$j][$k] = $subFactor;
     			}
     	   	}	
 		
-
-			
-        	$Sql = "SELECT * FROM `tbcriterion` WHERE idtbCriterion = ".$j;
+		
+        	$Sql = "SELECT * FROM `tbFactor` INNER JOIN tbFactorText ON tbFactor.idtbFactor = tbFactorText.tbfactor_idtbfactor WHERE idtbFactor = ".$j." AND tblanguage_idtblanguage = ".$_SESSION['language'];
         	$rs = mysqli_query($conexao, $Sql);
             	while ($linha = mysqli_fetch_array($rs, MYSQLI_ASSOC)) {
-            		//echo "<strong>".$rr['tbCriterionDesc']."</strong> "; 
-            		$criterion = $linha['tbCriterionDesc'];
+            		//echo "<strong>".$rr['tbFactorDesc']."</strong> "; 
+            		$Factor = $linha['tbFactorName'];
 			}
-			if ($criterion_weight != 0){
-				$result = $criterion_sum/$criterion_weight*20;
+			if ($Factor_weight != 0){
+				$result = $Factor_sum/$Factor_weight*20;
 	
-			    $criterion_value[$i][$j] = $result;
-				$criterion_name[$i][$j] = $criterion;
+			    $Factor_value[$i][$j] = $result;
+				$Factor_name[$i][$j] = $Factor;
 			}
 						
-	    	$artifact_sum = $artifact_sum + $criterion_sum;
-	    	$artifact_weight = $artifact_weight + $criterion_weight;
+	    	$artifact_sum = $artifact_sum + $Factor_sum;
+	    	$artifact_weight = $artifact_weight + $Factor_weight;
 			
 		}
 		
 		
-    	$Sql = "SELECT * FROM `tbartifact` WHERE idtbArtifact = ".$i;
+    	$Sql = "SELECT * FROM `tbartifact` INNER JOIN tbartifacttext ON tbartifact.idtbArtifact = tbArtifacttext.tbArtifact_idtbArtifact WHERE idtbArtifact = ".$i." AND tblanguage_idtblanguage = ".$_SESSION['language'];
     	$rs = mysqli_query($conexao, $Sql);
        	while ($linha = mysqli_fetch_array($rs, MYSQLI_ASSOC)) {
         		//echo "<strong>".$rr['tbArtifactDescription']."</strong> ";
-        		$artifact = $linha['tbArtifactDescription'];
+        		$artifact = $linha['tbArtifactDesc'];
         } 
 		if ($artifact_weight != 0) {
 			$result = $artifact_sum/$artifact_weight*20;
@@ -107,7 +106,7 @@ function detalhaResultados ($resultados) {
 
 	}
 	
-	return array($artifact_value,$artifact_name,$criterion_value,$criterion_name,$subcriterion_value,$subcriterion_name);
+	return array($artifact_value,$artifact_name,$Factor_value,$Factor_name,$subFactor_value,$subFactor_name);
 
 }
 

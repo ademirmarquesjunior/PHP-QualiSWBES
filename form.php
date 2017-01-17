@@ -1,4 +1,8 @@
-<?php session_start(); ?>
+<?php session_start(); 
+include "valida.php";
+include "language.php";
+include "conecta.php";
+?>
 <!DOCTYPE html>
 <html>
 
@@ -14,21 +18,12 @@
     </head>
 
     <body>
-    <?php
-    	include "conecta.php";
-	?>
+
         <div class="container-fluid">
-            <div class="jumbotron">
-                <h2>Modelo de Avaliação de Qualidade dos Sistemas Educacionais baseados 
-                    em Web Semântica (SEWebS) </h2>
-            </div>
-            <div id="login" class="well well-sm">
-                <?php
-                include("valida.php");
-                ?></div>
-	            <?php
+            <?php
+            	include 'header.php';
 	            include 'navbar.php';
-	            ?>
+	         ?>
 
                 
                 
@@ -45,10 +40,11 @@
                         } ?> </strong>'como 
                         <strong>'
                         <?php 
-                        $Sql = "SELECT * FROM `tbusertype` WHERE `idtbusertype` = ".$_SESSION['user_type'];
+                        $Sql = "SELECT * FROM `tbform` INNER JOIN tbusertypetext ON tbform.tbUserType_idtbUserType = tbusertypetext.tbUserType_idtbUserType WHERE tbform.idtbForm = ".$_SESSION['form_id']." AND tbLanguage_idtbLanguage = ".$_SESSION['language'];
                         $rs = mysqli_query($conexao,$Sql);
                         while ($row = mysqli_fetch_array($rs, MYSQLI_ASSOC)) {
-                        	echo $row['tbUserTypeDescripton']; 
+                        	echo $row['tbUserTypeDesc']; 
+                        	$user_type = $row['tbUserType_idtbUserType'];
                         } ?>'  
 						</strong>  
 					</div>
@@ -78,42 +74,60 @@
 
                         $order = "ORDER BY tbArtifact_idtbArtifact";
                         $artifact_change = '';
+                        $factor_change = '';
 						$id_change = '';
 
 						//$Sql = "SELECT * FROM `tbuserquestion` WHERE tbusertype_idtbUsertype = '".$_SESSION['user_type']."' ".$order;
-                        $Sql = "SELECT * FROM tbuserquestion INNER JOIN tbobjectives_has_tbuserquestion ON tbuserquestion.idtbUserQuestion = tbobjectives_has_tbuserquestion.tbUserQuestion_idtbUserQuestion WHERE tbobjectives_has_tbuserquestion.tbUserType_idtbUserType =  ".$_SESSION['user_type']." ".$order;
+                        $Sql = "SELECT * FROM tbuserquestion INNER JOIN tbquestiontext ON tbuserquestion.idtbUserQuestion = tbquestiontext.tbUserQuestion_idtbUserQuestion INNER JOIN tbobjectives_has_tbuserquestion ON tbuserquestion.idtbUserQuestion = tbobjectives_has_tbuserquestion.tbUserQuestion_idtbUserQuestion WHERE tbquestiontext.tbLanguage_idtbLanguage = ".$_SESSION['language']." AND tbobjectives_has_tbuserquestion.tbUserType_idtbUserType = ".$user_type." ".$order;
                         $rs = mysqli_query($conexao, $Sql) or die("Erro na pesquisa");
 
                         while ($linha = mysqli_fetch_array($rs, MYSQL_ASSOC)) {
                             $id = $linha["idtbUserQuestion"];
                             $artifact = $linha["tbArtifact_idtbArtifact"];
-                            $criterion = $linha["tbCriterion_idtbCriterion"];
-                            $question = $linha["tbUserQuestionText"];
-                            $howto = $linha["tbUserQuestionHowTo"];
-							
+                            $Factor = $linha["tbFactor_idtbFactor"];
+                            $question = $linha["tbQuestionText"];
+                            $howto = $linha["tbQuestionTextHowTo"];
+										$i = 0;
 							if ($id != $id_change) {
 
                             if ($artifact_change != $artifact) {
-                                $Sql2 = "SELECT * FROM `tbartifact` WHERE `idtbartifact` = '" . $artifact . "'";
+                                $Sql2 = "SELECT * FROM `tbartifact` INNER JOIN tbartifacttext ON tbartifact.idtbArtifact = tbartifacttext.tbArtifact_idtbArtifact WHERE tbartifact.idtbArtifact = '" . $artifact . "' AND tbLanguage_idtbLanguage = ".$_SESSION['language'];
                                 $rs2 = mysqli_query($conexao,$Sql2) or die("Erro na pesquisa");
                                 while ($linha2 = mysqli_fetch_array($rs2, MYSQLI_ASSOC)) {
                                     echo '<div class="panel panel-default"><div class="panel-body"><h2>';
-                                    echo $linha2['tbArtifactDescription'];
+                                    echo $linha2['tbArtifactName'];
                                     echo '</h2></div></div>';
                                     $artifact_change = $artifact;
                                 }
                             }
-				
-
-                            echo "<h4 id='question'>" . $question . "</h4>";
+                            
+                            if ($factor_change != $Factor) {
+                                $Sql2 = "SELECT * FROM `tbfactor` INNER JOIN tbfactortext ON tbfactor.idtbFactor = tbfactortext.tbFactor_idtbFactor WHERE tbfactor.idtbFactor = '" . $Factor . "' AND tbLanguage_idtbLanguage = ".$_SESSION['language'];
+                                $rs2 = mysqli_query($conexao,$Sql2) or die("Erro na pesquisa");
+                                while ($linha2 = mysqli_fetch_array($rs2, MYSQLI_ASSOC)) {
+                                    echo "<hr><h6>".$linha2['tbFactorName']."</h6>";
+                                    $factor_change = $Factor;
+                                }
+                            }
+                            
+                            
+										echo '<div class="panel-body">';
+										echo '<div class="row">';
+                            echo "<h3 id='question'>" . $question . "</h3>";
                             echo "<h5 id='howto'>" . $howto . "</h5>";
-                            echo "<div class='radio'><label><input type='radio' name=" . $id . " value='0' class='optradio' required/>0</label></div>";
+                            $i++;
+                            echo '<div class="col-md-4" align="right">';
+                            echo '<input type="range" name="'. $id .'" min="0" max="5">';
+									echo '</div>';
+									echo '</div>';
+									echo '</div>';
+                            /*echo "<div class='radio'><label><input type='radio' name=" . $id . " value='0' class='optradio' required/>0</label></div>";
                             echo "<div class='radio'><label><input type='radio' name=" . $id . " value='1' class='optradio' />1</label></div>";
                             echo "<div class='radio'><label><input type='radio' name=" . $id . " value='2' class='optradio'  />2</label></div>";
                             echo "<div class='radio'><label><input type='radio' name=" . $id . " value='3' class='optradio' />3</label></div>";
                             echo "<div class='radio'><label><input type='radio' name=" . $id . " value='4' class='optradio' />4</label></div>";
                             echo "<div class='radio'><label><input type='radio' name=" . $id . " value='5' class='optradio' />5</label></div>";
-                            echo "<hr>";
+                            echo "<hr>"; */
 							$id_change = $id;
 							}
                         }
@@ -121,13 +135,18 @@
 					</div>
                 </div>
             </form>
-			<div id="footer" class="well well-sm">
-				Desenvolvimento: Ademir Marques Junior - 2016 </div>
+            
+       
+            
+            <?php
+            include 'footer.php';
+            ?>
 		</div>
 <script>
          window.onload = function(){
     		swal("Neste aviso estará um pequeno texto explicando sobre o que será avaliado em geral, destacando que os objetos avaliados dependem do tipo de avaliador que está usando o sistema de avaliação.");
-          }           
+         }
+			
          </script>
 </body>
 

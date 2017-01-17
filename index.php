@@ -1,4 +1,6 @@
-<?php session_start(); ?>
+<?php session_start(); 
+include "language.php";
+?>
 <!DOCTYPE html>
 <head>
 <meta content="text/html; charset=utf-8" http-equiv="content-type" />
@@ -11,17 +13,9 @@
 <body>
 
 <div class="container-fluid">
-	<div class="jumbotron">
-		<h2>Modelo de Avaliação de Qualidade dos Sistemas Educacionais baseados 
-		em Web Semântica (SEWebS) </h2>
-	</div>
-	<div id="login" class="well well-sm">
-		Bem vindo <?php
-//include("valida.php");
-if(isset($_SESSION['user_login'])) {
-	echo " '".$_SESSION['user_login']."' ";
-	echo "<a href='logout.php'>Sair</a>";
-} ?></div>
+            <?php
+            include 'header.php';
+            ?>
 
             <?php
             include 'navbar.php';
@@ -74,8 +68,9 @@ if(isset($_SESSION['user_login'])) {
 		<div class="col-md-2">
 		</div>
 	</div>
-	<div id="footer" class="well well-sm">
-	Desenvolvimento: Ademir Marques Junior - 2016 </div>
+            <?php
+            include 'footer.php';
+            ?>
 	</div>
 </div>
 

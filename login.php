@@ -1,4 +1,10 @@
-<?php session_start(); ?>
+<?php session_start(); 
+if(isset($_SESSION['user_login'])) {
+	echo "<script> window.location.assign('index2.php')</script>";
+	//header('Location:index.php');
+	exit();
+} 
+?>
 <!DOCTYPE html>
 <html>
 
@@ -14,36 +20,20 @@
 <body>
 
 <div class="container-fluid">
-	<div class="jumbotron">
-		<h2>Modelo de Avaliação de Qualidade dos Sistemas Educacionais
-baseados em Web Semântica (SEWebS) </h2>
-	</div>
-	<div id="login" class="well well-sm">
-		<?php
-//include("valida.php");
-echo 'Bem vindo visitante';
-?></div>
             <?php
+            include 'header.php';
             include 'navbar.php';
             ?>
 
 	<h3>Login de usuário</h3>
-	<?php
-if(isset($_SESSION['user_login'])) {
-echo "Bem vindo '".$_SESSION['user_login']."' ";
-echo "<a href='logout.php'>Sair</a>";
-echo "<script> window.location.assign('index2.php')</script>";
-//header('Location:index.php');
-exit();
-} 
-?>
+
 	<form action="login.php" class="form-group" method="post" name="form1">
 		<p><label>Email</label></p>
 		<p>
-		<input id="entravalor" class="form-control" name="txt_usuario" required="" type="text" /></p>
+		<input id="entravalor" class="form-control" name="txt_user" required="" type="text" /></p>
 		<p><label>Senha</label></p>
 		<p>
-		<input id="entravalor" class="form-control" name="txt_senha" required="" type="password" /></p>
+		<input id="entravalor" class="form-control" name="txt_password" required="" type="password" /></p>
 		<p><input class="btn btn-default" type="submit" value="login"></p>
 	</form>
 	Clique <a href="cadastrar.php">aqui</a> para se cadastrar e ter acesso ao sistema.
@@ -51,33 +41,24 @@ exit();
 
 	include "conecta.php";
 	
-	if (isset($_POST['txt_usuario'])) {
-		$usuario = trim($_POST['txt_usuario']); 
-		$senha = trim($_POST['txt_senha']);
+	if (isset($_POST['txt_user'])) {
+		$user = trim($_POST['txt_user']); 
+		$password = md5(trim($_POST['txt_password']));
 		
-		$senha = md5($senha);
-	
-
-		$Sql="SELECT * FROM `tbuser` WHERE `tbEmail` = '".$usuario."' AND `tbPassword` = '".$senha."'";
+		$Sql="SELECT * FROM `tbuser` WHERE `tbUserEmail` = '".$user."' AND `tbUserPassword` = '".$password."'";
 		//$Sql = "SELECT * FROM `tbuser` WHERE `tbEmail` = 'admin@admin' AND `tbPassword` = '21232f297a57a5a743894a0e4a801fc3'";
-		echo $Sql;
 		$rs=mysqli_query($conexao, $Sql) or die ("<script language='javascript' type='text/javascript'> alert('Usuário ou senha incorreta'); window.location.href='login.php'; </script>");
 		
 		//echo $rs;
 		
-		while($linha = mysqli_fetch_array($rs, MYSQLI_ASSOC)) {
-			$user_id=$linha["idtbUser"];
-			$user_name=$linha["tbNome"];
-			echo $user_name;
-			$user_type=$linha["tbUserType_idtbUserType"];
+		while($row = mysqli_fetch_array($rs, MYSQLI_ASSOC)) {
+			$user_id=$row["idtbUser"];
+			$user_name=$row["tbUserName"];
 		}
-			
-		echo $user_name;
 			
 		if ($rs!=false) {		
 			$_SESSION['user_login'] = $user_name;
 			$_SESSION['user_id']=$user_id;
-			$_SESSION['user_type']=$user_type;
 			mysql_close($conexao);
 			echo "<script> window.location.assign('index2.php')</script>";
 			//header('Location:index2.php');
@@ -86,8 +67,9 @@ exit();
 	}
 			
 ?>
-	<div id="footer" class="well well-sm">
-		Desenvolvimento: Ademir Marques Junior - 2016 </div>
+            <?php
+            include 'footer.php';
+            ?>
 </div>
 
 </body>
