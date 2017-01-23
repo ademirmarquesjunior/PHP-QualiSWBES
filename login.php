@@ -13,6 +13,8 @@ if(isset($_SESSION['user_login'])) {
 <!-- <link rel="stylesheet" href="estilo.css" type="text/css" media="screen" /> -->
 <link href="css/bootstrap.min.css" rel="stylesheet">
 <link href="css/style.css" rel="stylesheet">
+    <script src="dist/sweetalert.js"></script>
+    <link rel="stylesheet" href="dist/sweetalert.css">
 <link rel="icon" type="image/png" href="favicon.png">
 <title>Avalia SEWebS</title>
 </head>
@@ -30,7 +32,7 @@ if(isset($_SESSION['user_login'])) {
 	<form action="login.php" class="form-group" method="post" name="form1">
 		<p><label>Email</label></p>
 		<p>
-		<input id="entravalor" class="form-control" name="txt_user" required="" type="text" /></p>
+		<input id="entravalor" class="form-control" name="txt_user" required="" type="email" /></p>
 		<p><label>Senha</label></p>
 		<p>
 		<input id="entravalor" class="form-control" name="txt_password" required="" type="password" /></p>
@@ -43,27 +45,31 @@ if(isset($_SESSION['user_login'])) {
 	
 	if (isset($_POST['txt_user'])) {
 		$user = trim($_POST['txt_user']); 
-		$password = md5(trim($_POST['txt_password']));
+		$password = trim($_POST['txt_password']);
 		
-		$Sql="SELECT * FROM `tbuser` WHERE `tbUserEmail` = '".$user."' AND `tbUserPassword` = '".$password."'";
+		$password = md5($password);
+		
+		$Sql="SELECT * FROM `tbuser` WHERE `tbuseremail` = '".$user."' AND `tbuserpassword` = '".$password."'";
 		//$Sql = "SELECT * FROM `tbuser` WHERE `tbEmail` = 'admin@admin' AND `tbPassword` = '21232f297a57a5a743894a0e4a801fc3'";
-		$rs=mysqli_query($conexao, $Sql) or die ("<script language='javascript' type='text/javascript'> alert('Usuário ou senha incorreta'); window.location.href='login.php'; </script>");
+		$rs = mysqli_query($conexao, $Sql) or die ("<script language='javascript' type='text/javascript'>
+								swal({   title: '',   text: 'Usuário ou senha incoreta!',    type: 'error'  },  function(){    window.location.href = 'login.php';});
+							</script>");
 		
-		//echo $rs;
-		
-		while($row = mysqli_fetch_array($rs, MYSQLI_ASSOC)) {
-			$user_id=$row["idtbUser"];
-			$user_name=$row["tbUserName"];
-		}
-			
-		if ($rs!=false) {		
+		if (mysqli_num_rows($rs)) {	
+			while($row = mysqli_fetch_array($rs, MYSQLI_ASSOC)) {
+				$user_id=$row["idtbUser"];
+				$user_name=$row["tbUserName"];
+			}	
 			$_SESSION['user_login'] = $user_name;
 			$_SESSION['user_id']=$user_id;
-			mysql_close($conexao);
 			echo "<script> window.location.assign('index2.php')</script>";
 			//header('Location:index2.php');
 			
-		}
+		} else { 
+			echo "<script language='javascript' type='text/javascript'>
+								swal({   title: '',   text: 'Usuário ou senha incoreta!',    type: 'error'  },  function(){    window.location.href = 'login.php';});
+							</script>";
+	   }
 	}
 			
 ?>

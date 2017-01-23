@@ -23,9 +23,9 @@ include "conecta.php";
             include 'header.php';
             include 'navbar.php';
             ?>
-
+				
             <h3>Minhas avaliações concluídas</h3>
-            
+            <img src="img/result.png" height="113" alt=""><br>
             <?php
             $Sql = "SELECT * FROM tbform INNER JOIN tbapplication ON tbapplication.idtbApplication = tbform.tbApplication_idtbApplication INNER JOIN tbusertypetext ON tbform.tbusertype_idtbUsertype = tbusertypetext.tbusertype_idtbusertype WHERE tbform.tbformCompleted = 1 AND tbform.tbUser_idtbUser = " . $_SESSION['user_id']." AND tblanguage_idtblanguage = ".$_SESSION['language']."  ";
             $rs = mysqli_query($conexao, $Sql);
@@ -39,13 +39,14 @@ include "conecta.php";
             <hr>
 
             <h3>Avaliações pendentes</h3>
+            <img src="img/form.png" height="113" alt=""><br>
 
             <?php
             $Sql = "SELECT * FROM tbform INNER JOIN tbapplication ON tbapplication.idtbApplication = tbform.tbApplication_idtbApplication INNER JOIN tbusertypetext ON tbform.tbusertype_idtbUsertype = tbusertypetext.tbusertype_idtbusertype WHERE tbform.tbformCompleted = 0 AND tbform.tbUser_idtbUser = " . $_SESSION['user_id']." AND tblanguage_idtblanguage = ".$_SESSION['language']."  ";
             $rs = mysqli_query($conexao, $Sql);
 
             while ($linha = mysqli_fetch_array($rs, MYSQLI_ASSOC)) {
-                echo "<span class='glyphicon glyphicon-expand'></span><a href='results.php?form=" . $linha['idtbForm'] . "'>" . $linha['tbApplicationName'] . "</a><br>";
+                echo "<span class='glyphicon glyphicon-expand'></span><a href='results.php?form=" . $linha['idtbForm'] . "'>" . $linha['tbApplicationName'] . " [ ".$linha['tbUserTypeDesc']." ]</a><br>";
             }
             if (mysqli_num_rows($rs) == 0)
                 echo "Não há nenhuma avaliação pendente<br>";

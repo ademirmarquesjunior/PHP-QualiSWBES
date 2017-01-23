@@ -1,10 +1,10 @@
 <nav class="navbar navbar-inverse">
   <div class="container-fluid">
     <div class="navbar-header">
-      <a class="navbar-brand" href="index2.php">QESWeBS</a>
+      <a class="navbar-brand" href="index2.php">QASWebEd</a>
     </div>
     <ul class="nav navbar-nav">
-      <li class="active"><a href="index2.php">Home</a></li>
+      <li class="active"><a href="index.php">Home</a></li>
       <?php 
       	if(isset($_SESSION['user_login'])) {      
       echo '<li class="active"><a href="index2.php">Nova avaliação</a></li>
@@ -12,11 +12,11 @@
       <li class="active"><a href="evaluations.php">Outras avaliações</a></li>';
    }
       ?>
-      <li><a href="index.php" target="_blank">Saiba mais</a></li>
+      <!-- <li><a href="index.php" target="_blank">Saiba mais</a></li> -->
     </ul>
     <ul class="nav navbar-nav navbar-right">
-    	<li><a href="language.php?lang=2">english</a></li>
-    	<li><a href="language.php?lang=1">portuguese</a></li>
+    	<!-- <li><a href="language.php?lang=2">english</a></li>
+    	<li><a href="language.php?lang=1">português</a></li> -->
       <li><a href="#"><span class="glyphicon glyphicon-user"></span>
 		 <?php 
       	if (isset($_SESSION['language'])) {
@@ -26,7 +26,7 @@
 					echo 'Bem vindo ';      		
       		}
       	} else {
-      		echo 'Bem vindo ';	
+      		echo '<a href="cadastrar.php">Cadastrar</a>';	
       	}
       ?>
       <?php 

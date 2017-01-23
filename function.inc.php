@@ -1,17 +1,22 @@
 <?php                       
 
 
-function extraiResultados ($form, $objective) {
+function extraiResultados ($value, $objective, $set) {
 	include "conecta.php";
 	$total = 0;
 	$total_weight = 0;
     $counter = 0;
     $sum = array(array(array()));
     $sym_weight = array(array(array()));
-    //$form = $_GET['form'];
-    if ($form != '') {
-        //$Sql = "SELECT * FROM `tbform_has_tbuserquestion` WHERE `tbForm_idtbForm` = " . $form;
-        $Sql = "SELECT * FROM tbuserquestion INNER JOIN tbobjectives_has_tbuserquestion on tbuserquestion.idtbUserQuestion = tbobjectives_has_tbuserquestion.tbUserQuestion_idtbUserQuestion INNER JOIN tbform_has_tbuserquestion ON tbuserquestion.idtbUserQuestion = tbform_has_tbuserquestion.tbUserQuestion_idtbUserQuestion WHERE tbform_has_tbuserquestion.tbForm_idtbForm = ".$form." AND tbobjectives_has_tbuserquestion.tbObjectives_idtbObjectives = ".$objective;
+
+    if ($value != '') {
+			    	
+		if ($set == 1) { //lista por aplicação
+			$Sql = "SELECT * FROM tbuserquestion INNER JOIN tbobjectives_has_tbuserquestion on tbuserquestion.idtbUserQuestion = tbobjectives_has_tbuserquestion.tbUserQuestion_idtbUserQuestion INNER JOIN tbform_has_tbuserquestion ON tbuserquestion.idtbUserQuestion = tbform_has_tbuserquestion.tbUserQuestion_idtbUserQuestion INNER JOIN tbform ON tbform_has_tbuserquestion.tbform_idtbform = tbform.idtbform  WHERE tbform.tbapplication_idtbapplication = ".$value." AND tbobjectives_has_tbuserquestion.tbObjectives_idtbObjectives = ".$objective;
+		} elseif($set == 2) { //lista por formulário
+			$Sql = "SELECT * FROM tbuserquestion INNER JOIN tbobjectives_has_tbuserquestion on tbuserquestion.idtbUserQuestion = tbobjectives_has_tbuserquestion.tbUserQuestion_idtbUserQuestion INNER JOIN tbform_has_tbuserquestion ON tbuserquestion.idtbUserQuestion = tbform_has_tbuserquestion.tbUserQuestion_idtbUserQuestion WHERE tbform_has_tbuserquestion.tbForm_idtbForm = ".$value." AND tbobjectives_has_tbuserquestion.tbObjectives_idtbObjectives = ".$objective;
+		}	
+		    	
         $rs = mysqli_query($conexao, $Sql) or die("Formulário não existe");
 
         while ($linha = mysqli_fetch_array($rs, MYSQLI_ASSOC)) {
@@ -56,7 +61,7 @@ function detalhaResultados ($resultados) {
     		
     		//echo "...".$j."<br>";
     		foreach ($valueFactor as $k=>$valuesubFactor) {
-    			$Sql = "SELECT * FROM `tbsubFactor` INNER JOIN tbSubFactorText ON tbSubFactor.idtbSubFactor = tbSubFactorText.tbsubfactor_idtbSubfactor  WHERE idtbSubFactor = ".$k." AND tblanguage_idtblanguage = ".$_SESSION['language'];
+    			$Sql = "SELECT * FROM `tbsubfactor` INNER JOIN tbsubfactortext ON tbsubfactor.idtbsubfactor = tbsubfactortext.tbsubfactor_idtbSubfactor  WHERE idtbSubFactor = ".$k." AND tblanguage_idtblanguage = ".$_SESSION['language'];   			
     			$rs = mysqli_query($conexao, $Sql);
             	while ($linha = mysqli_fetch_array($rs, MYSQLI_ASSOC)) {
             		//echo $rr['tbSubFactorDesc']." "; 
@@ -73,7 +78,7 @@ function detalhaResultados ($resultados) {
     	   	}	
 		
 		
-        	$Sql = "SELECT * FROM `tbFactor` INNER JOIN tbFactorText ON tbFactor.idtbFactor = tbFactorText.tbfactor_idtbfactor WHERE idtbFactor = ".$j." AND tblanguage_idtblanguage = ".$_SESSION['language'];
+        	$Sql = "SELECT * FROM `tbfactor` INNER JOIN tbfactortext ON tbfactor.idtbfactor = tbfactortext.tbfactor_idtbfactor WHERE idtbfactor = ".$j." AND tblanguage_idtblanguage = ".$_SESSION['language'];
         	$rs = mysqli_query($conexao, $Sql);
             	while ($linha = mysqli_fetch_array($rs, MYSQLI_ASSOC)) {
             		//echo "<strong>".$rr['tbFactorDesc']."</strong> "; 
@@ -92,7 +97,7 @@ function detalhaResultados ($resultados) {
 		}
 		
 		
-    	$Sql = "SELECT * FROM `tbartifact` INNER JOIN tbartifacttext ON tbartifact.idtbArtifact = tbArtifacttext.tbArtifact_idtbArtifact WHERE idtbArtifact = ".$i." AND tblanguage_idtblanguage = ".$_SESSION['language'];
+    	$Sql = "SELECT * FROM `tbartifact` INNER JOIN tbartifacttext ON tbartifact.idtbartifact = tbartifacttext.tbartifact_idtbartifact WHERE idtbartifact = ".$i." AND tblanguage_idtblanguage = ".$_SESSION['language'];
     	$rs = mysqli_query($conexao, $Sql);
        	while ($linha = mysqli_fetch_array($rs, MYSQLI_ASSOC)) {
         		//echo "<strong>".$rr['tbArtifactDescription']."</strong> ";

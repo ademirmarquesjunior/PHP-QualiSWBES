@@ -15,9 +15,6 @@ include "language.php";
 <div class="container-fluid">
             <?php
             include 'header.php';
-            ?>
-
-            <?php
             include 'navbar.php';
             ?>
 
