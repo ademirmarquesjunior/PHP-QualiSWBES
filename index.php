@@ -21,9 +21,9 @@ include "language.php";
 
 	<div class="row">
 		<div class="col-md-8">
-			<h1>Modelo de Avaliação de Qualidade dos Sistemas Educacionais baseados em Web Semântica:<br> Avalia SEWebS</h1>
+			<h1>Modelo de Avaliação de Qualidade dos Sistemas Educacionais baseados em Web Semântica:<br> Avalia QASWebEd</h1>
 			<p>Esse Modelo de Avaliação de Qualidade dos Sistemas Educacionais baseados 
-			em Web Semântica (SEWebS) tem por objetivo permitir que os profissionais 
+			em Web Semântica (QASWebEd) tem por objetivo permitir que os profissionais 
 			(engenheiros do conhecimento, engenheiros de ontologias, desenvolvedores, 
 			autores, professores, tutores, gestores de instituições de ensino, estudantes) 
 			que precisam adquirir/eleger um sistema para uso possam Avaliar os mesmos, 

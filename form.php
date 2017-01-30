@@ -13,7 +13,11 @@ include "conecta.php";
         <link href="css/style.css" rel="stylesheet">
         <link rel="stylesheet" href="css/sweetalert.css">
         <link rel="stylesheet" type="text/css" href="slider/rzslider.css"/>
-        
+			<script src="js/jquery-3.1.1.min.js"></script>        
+        <script src="js/bootstrap.min.js"></script>
+			<script src="js/sweetalert.js"></script>
+			<script src="slider/angular.min.js"></script>
+			<script src="slider/rzslider.min.js"></script>        
         <link rel="icon" type="image/png" href="favicon.png">
         <title>Avalia SEWebS</title>
     </head>
@@ -211,11 +215,7 @@ function(isConfirm) {
             include 'footer.php';
             ?>
         </div>
-			<script src="js/jquery-3.1.1.min.js"></script>        
-        <script src="js/bootstrap.min.js"></script>
-			<script src="js/sweetalert.js"></script>
-			<script src="slider/angular.min.js"></script>
-			<script src="slider/rzslider.min.js"></script>
+
 			
         <script>
             window.onload = function () {

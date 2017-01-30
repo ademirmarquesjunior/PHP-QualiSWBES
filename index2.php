@@ -13,6 +13,11 @@ include "conecta.php";
         <link href="css/style.css" rel="stylesheet">
         <link rel="stylesheet" type="text/css" href="slider/rzslider.css"/>
         <link rel="stylesheet" href="css/sweetalert.css">
+        <script src="js/jquery-3.1.1.min.js"></script>        
+        <script src="js/bootstrap.min.js"></script>
+			<script src="js/sweetalert.js"></script>
+			<script src="slider/angular.min.js"></script>
+			<script src="slider/rzslider.min.js"></script>
         <link rel="icon" type="image/png" href="favicon.png">
         <title>Avalia SEWebS</title>
     </head>
@@ -48,11 +53,32 @@ include "conecta.php";
 
                     if ($i) { //Verifica se já existe uma aplicação com o mesmo nome
                         //Trocar confirm() por equivalente em 'SweetAlert'
-                        echo "<script language='javascript' type='text/javascript'> if(!confirm('Já existe uma aplicação com esse nome. Deseja avaliar a aplicação encontrada?')) {window.location.href='index2.php'; } </script>";
-
-                        $linha = mysqli_fetch_array($rs, MYSQLI_ASSOC);
-                        $applic_id = $linha["idtbApplication"];
-                        $_SESSION['appic_id'] = $applic_id;
+                        echo '<script> 
+								swal({
+								  title: "Já existe um sistema cadastrado com esse nome",
+								  text: "Escolha o tipo de usuário novamente e selecione um dos sistemas cadastrados e clique em Começar se quiser avaliar esse sistema, ou insira um sistema com outro nome.",
+								  type: "warning",
+								  showCancelButton: false,
+								  timer: 100000,
+								  confirmButtonClass: "btn-info",
+								  confirmButtonText: "OK",
+								  cancelButtonText: "Não",
+								  closeOnConfirm: false,
+								  closeOnCancel: false
+								},
+								function(isConfirm) {
+								  if (isConfirm) {
+								    setTimeout(window.location.assign("index2.php"),100000);
+								  } 
+								  if (!(isConfirm)) {
+								    setTimeout(window.location.assign("index2.php"),100000);
+								  } 
+								});                        
+                        </script>';
+								exit();
+                        //$linha = mysqli_fetch_array($rs, MYSQLI_ASSOC);
+                        //$applic_id = $linha["idtbApplication"];
+                        //$_SESSION['appic_id'] = $applic_id;
                     } else {
                     	
                     		//inserir nova aplicação
@@ -64,34 +90,63 @@ include "conecta.php";
                     }
                 }
 
-
+					 //Se a id da aplicação foi recebida via POST, salvar a id na sessão
                 if (isset($_POST['sel_aplic'])) {
                     $applic_id = $_POST['sel_aplic'];
                     $_SESSION['appic_id'] = $applic_id;
                 }
 
-
+					 //Verificar se a id de aplicação foi salva na sessão
                 if (isset($_SESSION['appic_id'])) {
                 	
-                    //Verificar se há um formulário com as mesmas características
+                    //Procurar no banco um formulário com as mesmas características
                     $Sql = "SELECT * FROM tbform WHERE tbapplication_idtbapplication = '" . $applic_id . "' AND tbuser_idtbUser = '" . $user . "' AND tbUserType_idtbUserType = ".$user_type;
                     $rs = mysqli_query($conexao, $Sql) or die ('Erro na busca de formulário já criado');
                     $linha = mysqli_fetch_array($rs, MYSQLI_ASSOC);
-                    $form_id = $linha["idtbForm"];
+                    
 
-                    if (mysqli_num_rows($rs) == 0) { //Inserir novo formulário caso o mesmo não exista
+
+						  //Se não for encontrado nenhum registro de formulário, inserir novo formulário
+                    if (mysqli_num_rows($rs) == 0) {
                     		$Sql2 = "INSERT INTO `tbform` (`idtbForm`, `tbApplication_idtbApplication`, `tbUser_idtbUser`, `tbFormCompleted`, `tbFormStatus`, `tbUserType_idtbUserType`, `tbFormDate`) VALUES (NULL, '".$applic_id."', '".$user."', '0', '0', '".$user_type."', NULL)";
-                        $rs2 = mysqli_query($conexao, $Sql2) or die('Erro na inserção do formulário');
+                        $rs2 = mysqli_query($conexao, $Sql2) or die ('Erro na inserção do formulário');
 
                         //obter o id do form inserido
-                        if ($rs) {
-                            $form_id = mysqli_insert_id($conexao);
-                            $_SESSION['form_id'] = $form_id;
-                            echo "<script> window.location.assign('form.php')</script>";
-                            //header('Location:form.php');
-                        }
-                    } else {
-								echo "<script> window.location.assign('results.php?form=".$form_id."')</script>";
+                         $form_id = mysqli_insert_id($conexao);
+                         $_SESSION['form_id'] = $form_id;
+                         echo "<script> window.location.assign('form.php')</script>";
+                         //header('Location:form.php');
+                        
+                    } else { //Se um registro for encontrado
+                    		$linha = mysqli_fetch_array($rs, MYSQLI_ASSOC);
+                    		$form_id = $linha["idtbForm"];
+                    		$_SESSION['form_id'] = $form_id;
+                    		$completed = $linha["tbFormCompleted"];
+                    		
+                    		echo '<script> 
+								swal({
+								  title: "Questionário já preenchido",
+								  text: "Você já respondeu a um questionário com essa configuração. Indo para resultados...",
+								  type: "warning",
+								  showCancelButton: false,
+								  timer: 100000,
+								  confirmButtonClass: "btn-info",
+								  confirmButtonText: "OK",
+								  cancelButtonText: "Não",
+								  closeOnConfirm: false,
+								  closeOnCancel: false
+								},
+								function(isConfirm) {
+								  if (isConfirm) {
+								    setTimeout(window.location.assign("results.php?form='.$form_id.'"),100000);
+								  } 
+								  if (!(isConfirm)) {
+								    setTimeout(window.location.assign("results.php?form='.$form_id.'"),100000);
+								  } 
+								});								
+								
+								</script>';
+								exit();
                     }
                 }
             }
@@ -151,11 +206,7 @@ include "conecta.php";
             include 'footer.php';
             ?>
         </div>
-        <script src="js/jquery-3.1.1.min.js"></script>        
-        <script src="js/bootstrap.min.js"></script>
-			<script src="js/sweetalert.js"></script>
-			<script src="slider/angular.min.js"></script>
-			<script src="slider/rzslider.min.js"></script>
+
         <script>
  				/*function show(id) {
 				
