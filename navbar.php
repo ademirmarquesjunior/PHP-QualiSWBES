@@ -7,7 +7,7 @@
       <li class="active"><a href="index.php">Home</a></li>
       <?php 
       	if(isset($_SESSION['user_login'])) {      
-      echo '<li class="active"><a href="index2.php">Nova avaliação</a></li>
+      echo '<li class="active"><a href="index3.php">Início</a></li>
       <li class="active"><a href="myevaluations.php">Minhas avaliações</a></li>
       <li class="active"><a href="evaluations.php">Outras avaliações</a></li>';
    }

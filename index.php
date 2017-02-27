@@ -59,8 +59,8 @@ include "language.php";
 			as necessidades individuais de cada aluno) e também mais linear/dinâmico, 
 			(ou seja, o conteúdo está sempre disponível, o acesso se dá de acordo 
 			com a agenda do aluno). </p>
-			<a class="btn btn-primary btn-large" href="index2.php">Começar uma avaliação</a>
-			
+			<!-- <a class="btn btn-primary btn-large" href="index2.php">Começar uma avaliação</a>
+			 -->
 		</div>
 		<div class="col-md-2">
 		</div>

@@ -31,15 +31,25 @@ include "conecta.php";
             ?>
 
             <?php
+            
             $Sql = "SELECT * FROM `tbform` INNER JOIN tbusertypetext ON tbform.tbUserType_idtbUserType = tbusertypetext.tbUserType_idtbUserType INNER JOIN `tbapplication` ON tbapplication.idtbapplication = tbform.tbapplication_idtbapplication WHERE tbform.idtbForm = " . $_SESSION['form_id'] . " AND tbLanguage_idtbLanguage = " . $_SESSION['language'];
-            $rs = mysqli_query($conexao, $Sql) or die("Formulário não encontrado");
+            $rs = mysqli_query($conexao, $Sql) or die ("Formulário não encontrado");
             while ($row = mysqli_fetch_array($rs, MYSQLI_ASSOC)) {
+            	$applic_id = $row['idtbApplication'];
                 $applic_name = $row['tbApplicationName'];
                 $type_name = $row['tbUserTypeDesc'];
                 $status = $row['tbFormStatus'];
                 $user_type = $row['tbUserType_idtbUserType'];
             }
-
+            
+           $Sql = "SELECT * FROM `tblearningobjects` WHERE tbapplication_idtbapplication = ".$applic_id;
+           $rs = mysqli_query($conexao, $Sql) or die ("Formulário não encontrado");
+           $num_learningobjects = mysqli_num_rows($rs);
+           
+           $Sql = "SELECT * FROM `tbontologies` WHERE tbapplication_idtbapplication = ".$applic_id;
+           $rs = mysqli_query($conexao, $Sql) or die ("Formulário não encontrado");
+           $num_onlogies =  mysqli_num_rows($rs);
+				
             $inserted = 0;
 
             //Insere as questões respondidas
@@ -52,48 +62,25 @@ include "conecta.php";
             }
 
 				//Se a variável new foi recebida o status é incrementado indicando que o formulário deve prosseguir para outro artefato
-            if ((isset($_GET['new']))) {
+/*            if ((isset($_GET['new']))) {
                 $status++;
                 $Sql2 = "UPDATE `tbform` SET `tbFormStatus` = '" . $status . "' WHERE `tbform`.`idtbForm` = " . $_SESSION['form_id'] . " AND `tbform`.`tbApplication_idtbApplication` = " . $_SESSION['appic_id'] . " AND `tbform`.`tbUser_idtbUser` = " . $_SESSION['user_id'];
                 $rs2 = mysqli_query($conexao, $Sql2) or die("Erro na atualização de estado");
              }
-
+*/
 
             //Se questões foram inseridas na tabela de respostas incrementar o status
-            if ($inserted == 1) {
-
-                //Se o Artefato for Ontologia ou Objeto de Aprendizagem perguntar ao usuário se ele quer continuar avaliando o mesmo tipo novamente									
-                if ($status < 3) {
-                    $Sql = "SELECT * FROM tbartifacttext WHERE tblanguage_idtblanguage = " . $_SESSION['language'] . " AND tbartifact_idtbartifact = " . $status;
-                    $rs = mysqli_query($conexao, $Sql);
-                    $row = mysqli_fetch_array($rs, MYSQLI_ASSOC);
-                    echo '<script> swal({
-  title: "' . $row['tbArtifactName'] . '",
-  text: "Deseja avaliar outro ' . $row['tbArtifactName'] . '?",
-  type: "warning",
-  showCancelButton: true,
-  timer: 100000,
-  confirmButtonClass: "btn-danger",
-  confirmButtonText: "Sim, continuar",
-  cancelButtonText: "Não, seguir para outro artefato",
-  closeOnConfirm: false,
-  closeOnCancel: false
-},
-function(isConfirm) {
-  if (isConfirm) {
-    setTimeout(window.location.assign("form.php"),100000);
-  } 
-  if (!(isConfirm)) {
-    setTimeout(window.location.assign("form.php?new=1"),100000);
-  } 
-});
-</script>';
-                    exit();
-                }
-
-
-
-                $status++;
+            if ($inserted == 1) {	
+            							
+             	if(($status < (1+($num_onlogies-1)/10)) AND ((int)$status == 1)) {
+                	$status = $status + 0.1;
+                } elseif (($status < (2+($num_learningobjects-1)/10)) AND ((int)$status == 2)) {
+                	$status = $status + 0.1;
+                } else {
+             	$status= (int)$status + 1;
+               }
+                
+                
                 $Sql2 = "UPDATE `tbform` SET `tbFormStatus` = '" . $status . "' WHERE `tbform`.`idtbForm` = " . $_SESSION['form_id'] . " AND `tbform`.`tbApplication_idtbApplication` = " . $_SESSION['appic_id'] . " AND `tbform`.`tbUser_idtbUser` = " . $_SESSION['user_id'];
                 echo $Sql;
                 $rs2 = mysqli_query($conexao, $Sql2) or die("Erro na atualização de estado");
@@ -131,7 +118,7 @@ function(isConfirm) {
                         $id_change = '';
 
                         //Listar as questões do formulário
-                        $Sql = "SELECT * FROM tbuserquestion INNER JOIN tbquestiontext ON tbuserquestion.idtbUserQuestion = tbquestiontext.tbUserQuestion_idtbUserQuestion INNER JOIN tbobjectives_has_tbuserquestion ON tbuserquestion.idtbUserQuestion = tbobjectives_has_tbuserquestion.tbUserQuestion_idtbUserQuestion WHERE tbartifact_idtbArtifact = " . $status . " AND tbquestiontext.tbLanguage_idtbLanguage = " . $_SESSION['language'] . " AND tbobjectives_has_tbuserquestion.tbUserType_idtbUserType = " . $user_type . " " . $order;
+                        $Sql = "SELECT * FROM tbuserquestion INNER JOIN tbquestiontext ON tbuserquestion.idtbUserQuestion = tbquestiontext.tbUserQuestion_idtbUserQuestion INNER JOIN tbobjectives_has_tbuserquestion ON tbuserquestion.idtbUserQuestion = tbobjectives_has_tbuserquestion.tbUserQuestion_idtbUserQuestion WHERE tbartifact_idtbArtifact = " . (int)$status . " AND tbquestiontext.tbLanguage_idtbLanguage = " . $_SESSION['language'] . " AND tbobjectives_has_tbuserquestion.tbUserType_idtbUserType = " . $user_type . " " . $order;
                         $rs = mysqli_query($conexao, $Sql) or die("Erro na pesquisa");
 
                         if (mysqli_num_rows($rs) == 0) {
@@ -216,35 +203,71 @@ function(isConfirm) {
             ?>
         </div>
 
+<?php 
+if ((int)$status == 1){
+	$Sql = 'SELECT * FROM `tbontologies` WHERE tbApplication_idtbApplication = '.$applic_id;
+	$rs = mysqli_query($conexao, $Sql) or die("Erro insere formulário");
+	$ontology = (int)(($status -1)*10)+1;
+	$ontology_name = '';
+	echo $ontology;
+	$i = 0;
+	while($row = mysqli_fetch_assoc($rs)) {
+		$i=$i + 1;
+		if ($i == $ontology) $ontology_name = $row['tbOntologiesName'];	
+	}
+	
+	echo '<script>
+            window.onload = function () {
+                swal("Ontologias", "Você está avaliando o elemento `'.$ontology_name.'`");
+            }</script>';
+}
+
+if ((int)$status == 2){
+	$Sql = 'SELECT * FROM `tblearningobjects` WHERE tbApplication_idtbApplication = '.$applic_id;
+	$rs = mysqli_query($conexao, $Sql) or die ("Erro");
+	$learningobject = (int)(($status -2)*10)+1;
+	$learningobject_name = '';
+	$i = 0;
+	while($row = mysqli_fetch_assoc($rs)) {
+		$i=$i + 1;
+		//echo $i.' '.$learningobject.' '.$status.' '.$row['tbLearningObjectsName'].'<br>';
+		if ($i == $learningobject) { 
+			$learningobject_name = $row['tbLearningObjectsName']; 
+			//echo 'true'.$row['tbLearningObjectsName'].'<br>';
+		}
+	}
+	
+	echo '<script>
+            window.onload = function () {
+                swal("Objetos de Aprendizagem", "Você está avaliando o elemento `'.$learningobject_name.'`");
+            }</script>';
+}
+
+if ((int)$status == 3){
+	echo '<script>
+            window.onload = function () {
+                swal("Interface", "Neste aviso estará um pequeno texto explicando sobre o que será avaliado em geral, destacando que os objetos avaliados dependem do tipo de avaliador que está usando o sistema de avaliação.");
+            }</script>';
+}
+
+if ((int)$status == 4){
+	echo '<script>
+            window.onload = function () {
+                swal("Software", "Neste aviso estará um pequeno texto explicando sobre o que será avaliado em geral, destacando que os objetos avaliados dependem do tipo de avaliador que está usando o sistema de avaliação.");
+            }</script>';
+}
+
+
+?>			
+			
 			
         <script>
-            window.onload = function () {
-                swal("Artefato", "Neste aviso estará um pequeno texto explicando sobre o que será avaliado em geral, destacando que os objetos avaliados dependem do tipo de avaliador que está usando o sistema de avaliação.");
-            }
 
             $(function(){
     				$('[data-toggle=tooltip]').tooltip();
  				});
         </script>
-        <script>
-        		var app = angular.module('rzSliderDemo', ['rzModule', 'ui.bootstrap']);
-
-				app.controller('MainCtrl', function ($scope, $rootScope, $timeout, $modal) {
-					$scope.slider_ticks_values = {
-        value: 5,
-        options: {
-            ceil: 10,
-            floor: 0,
-            showTicksValues: true
-        }
-    };
-					
-					
-				}
-        
-        
-        
-        </script>
+      
         
     </body>
 

@@ -36,9 +36,9 @@ if(isset($_SESSION['user_login'])) {
             $user = $_POST['txt_nome'];
             $email = $_POST['txt_email'];
             $password = md5($_POST['txt_password1']);
-
-            $Sql = "INSERT INTO `tbuser` (`idtbUser`, `tbUserName`, `tbUserEmail`, `tbUserPassword`) VALUES (NULL, '" . $user . "', '" . $email . "', '" . $password . "')";
-
+            
+            $Sql = "INSERT INTO `tbuser` (`idtbUser`, `tbUserName`, `tbUserEmail`, `tbUserPassword`, `tbUserLevel`, `tbUserValid`) VALUES (NULL, '" . $user . "', '" . $email . "', '" . $password . "', '1', NULL)";
+            
             $rs = mysqli_query($conexao, $Sql) or die ("<script language='javascript' type='text/javascript'>
 								swal({   title: '',   text: 'Já existe um usuário com esse email!',    type: 'error'  },  function(){    window.location.href = 'cadastrar.php';});
 							</script>");
@@ -47,6 +47,7 @@ if(isset($_SESSION['user_login'])) {
             if ($rs) {
             	$_SESSION['user_login'] = $user;
 					$_SESSION['user_id'] = mysqli_insert_id($conexao);
+					$_SESSION['user_level'] = 1;
                 echo "<script language='javascript' type='text/javascript'>
 								swal({   title: '',   text: 'Cadastro realizado com sucesso',    type: 'success'  },  function(){    window.location.href = 'index2.php';});
 							</script>";
