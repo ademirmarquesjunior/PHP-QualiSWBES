@@ -64,32 +64,67 @@ include "function.inc.php";
              			$applic_name = $linha['tbApplicationName'];
              			$applic_id = $linha['idtbApplication'];
              		}
-             		
-             	
-             	
              	} else {
              		echo "<script> window.location.assign('index.php')</script>";
              	}
 					             	
             	//exit();
              } else {
-             	echo "<script> window.location.assign('index2.php')</script>";
+             	echo "<script> window.location.assign('index3.php')</script>";
              }     
               
             ?>
                   
-            <div class="panel panel-info">
+            <div class="panel panel-default">
                <div class="panel-heading">
-                  <h1>Resultado de avaliação</h1>
-                  <img src="img/result.png" height="113" alt=""> 
+                  <h1>Resultado de avaliação:</h1>
  						<?php
  							if (isset($_GET['form'])) {
-							echo "<h3><strong>".$user_name."</strong> avaliou <strong>".$applic_name."</strong> como <strong>".$type_name."</strong></h3>";
+ 								echo '<div class="panel panel-default">
+               				<div class="panel-body">';
+								echo "<h3><img src='img/result.png' height='113' alt=''><strong>".$user_name."</strong> avaliou <strong>".$applic_name."</strong> como <strong>".$type_name."</strong></h3>";
+								echo "</div></div>";
 						}      
 							
 						if (isset($_GET['applic'])) {
-							echo "<h3><strong>".$applic_name."</strong></h3>"; 
-						}                             
+							echo '<div class="panel panel-default">
+               				<div class="panel-body">';
+							echo "<h1><img src='img/result.png' height='113' alt=''><strong>".$applic_name."</strong></h1>";
+							echo "</div></div>";
+							echo '<p><strong>Sistema avaliado por:</strong><br>';
+							
+							$Sql = "SELECT * FROM `tbform` INNER JOIN tbuser ON tbform.tbUser_idtbUser = tbuser.idtbUser INNER JOIN tbusertypetext ON tbform.tbUserType_idtbUserType = tbusertypetext.tbUserType_idtbUserType WHERE tbform.tbFormCompleted = 1 AND tbusertypetext.tbLanguage_idtbLanguage = 1 AND tbform.tbApplication_idtbApplication =" . $applic_id;
+            			$rs = mysqli_query($conexao, $Sql);
+            			while ($row = mysqli_fetch_assoc($rs)) {
+            				echo '<span class="glyphicon glyphicon-user"></span> <strong>'.$row['tbUserName'].'</strong> como <strong>'.$row['tbUserTypeDesc'].'</strong><br>';
+            			}
+            			echo '</p>';
+            			          			
+            			
+						}
+						$Sql = "SELECT * FROM `tblearningobjects` WHERE tbApplication_idtbApplication = " . $applic_id;
+				         $rs = mysqli_query($conexao, $Sql);
+				         if (mysqli_num_rows($rs) == 0) {
+				             echo "<p>Não há Objetos de aprendizagem avaliados</p>";
+				         } else {
+				         	echo '<p><strong>Objetos de Aprendizagem avaliados:</strong><br>';
+				             while ($row = mysqli_fetch_assoc($rs)) {
+				                 echo '<span class="glyphicon glyphicon-unchecked"></span> '.$row['tbLearningObjectsName'].'<br>';
+				             }
+				             echo '</p>';
+				         }  
+				         
+				         $Sql = "SELECT * FROM `tbOntologies` WHERE tbApplication_idtbApplication = " . $applic_id;
+				         $rs = mysqli_query($conexao, $Sql);
+				         if (mysqli_num_rows($rs) == 0) {
+				             echo "<p>Não há Objetos de aprendizagem avaliados</p>";
+				         } else {
+				         	echo '<p><strong>Ontologias avaliadas:</strong><br>';
+				             while ($row = mysqli_fetch_assoc($rs)) {
+				                 echo '<span class="glyphicon glyphicon-unchecked"></span> '.$row['tbOntologiesName'].'<br>';
+				             }
+				             echo '</p>';
+				         }                             
  						?>
                </div>
             </div>

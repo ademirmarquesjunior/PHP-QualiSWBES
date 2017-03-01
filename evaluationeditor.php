@@ -32,6 +32,11 @@ include "conecta.php";
 
 
             <?php
+            
+				if ($_SESSION['user_level'] <2) {
+            	echo "<script> window.location.assign('index.php')</script>";	
+            }            
+            
 //----------Funções
 
 //----------Apagar questões
@@ -72,13 +77,16 @@ include "conecta.php";
                     //mostrar mensagem indicando que uma aplicação de mesmo nome já foi cadastrada
                 } else {
                     $Sql = "INSERT INTO `tbapplication` (`idtbApplication`, `tbApplicationName`, `tbApplicationDescription`, `tbUser_idtbUser`) VALUES (NULL, '" . $applic_name . "', '" . $applic_text . "', '" . $user . "')";
-                    echo $Sql;
+                    //echo $Sql;
                     $rs = mysqli_query($conexao, $Sql) or die ("Erro na inserção");
                     $applic_id = mysqli_insert_id($conexao);
-                    //$_SESSION['applic_id'] = $applic_id;
-                    //atualizar página?
-                    echo '<h1>' . $applic_name . '</h1>';
-                    echo '<p>' . $applic_text . '</p>';
+                    echo '<div class="panel panel-default">';
+                    echo '<div class="panel-heading">';
+                    echo '<div class="panel panel-default">
+               				<div class="panel-body">';
+							echo "<h1><img src='img/result.png' height='113' alt=''><strong>".$applic_name."</strong></h1>";
+							echo "</div></div>";
+                    echo '<p>' . $applic_text . '</p></div></div>';
                 }
             }
 
@@ -95,11 +103,16 @@ include "conecta.php";
                     $row = mysqli_fetch_assoc($rs);
                     $applic_name = $row['tbApplicationName'];
                     $applic_text = $row['tbApplicationDescription'];
-                    echo '<div class="panel panel-info">';
+                    echo '<div class="panel panel-default">';
                     echo '<div class="panel-heading">';
-                    echo '<h1>' . $applic_name . '</h1>';
+                    echo '<div class="panel panel-default">
+               				<div class="panel-body">';
+							echo "<h1><img src='img/result.png' height='113' alt=''><strong>".$applic_name."</strong></h1>";
+							echo "</div></div>";
                     echo '<p>' . $applic_text . '</p></div></div>';
                 }
+            } else {
+					echo "<script> window.location.assign('index3.php')</script>";            
             }
             
 	
@@ -186,6 +199,38 @@ include "conecta.php";
 					
 					$Sql = "INSERT INTO `tbontologies` (`idOntologies`, `tbOntologiesName`, `tbOntologiesText`, `tbApplication_idtbApplication`) VALUES (NULL, '".$ontology."', NULL, '".$applic_id."')";
 					$rs = mysqli_query($conexao, $Sql) or die ("Erro na inserção");
+				}
+				
+//----------Notificar usuário
+				if (isset($_POST['submitNotifyUser'])) {
+					 $applic_id = $_POST['applic_id'];
+                $form_id = $_POST['form_id'];
+                
+                $Sql = "SELECT * FROM `tbform` INNER JOIN tbuser ON tbform.tbUser_idtbUser = tbuser.idtbUser INNER JOIN tbusertypetext ON tbform.tbUserType_idtbUserType = tbusertypetext.tbUserType_idtbUserType WHERE tbusertypetext.tbLanguage_idtbLanguage = 1 AND tbform.tbApplication_idtbApplication =" . $applic_id;
+	            $rs = mysqli_query($conexao, $Sql);
+               while ($row = mysqli_fetch_assoc($rs)) {
+               	$email = $row['tbUserEmail'];
+               	$user = $row['tbUserName'];
+               	
+               }
+               $to = $email;
+					$subject = "[AvaliaQASWebE] Usuário cadastrado";
+					$txt = "<html><head><title>HTML email</title></head>
+						<body>
+						<h3>Olá ".$user."</h3>
+						<p>Você foi indicado para avaliar um sistema educacional utilizando o sistema de avaliação de sistemas educacionais baseados em Web Semântica AvaliaQASWebE disponível  <a href='http://avaliasewebs.caed-lab.com/index.php' target='_blank'>aqui</a>.</p>
+						<p>Acesse a área principal para acessar o formulário de avaliação.</p>
+						</body>
+						</html>";
+					$headers = "MIME-Version: 1.0" . "\r\n";
+					$headers .= "Content-type:text/html;charset=UTF-8" . "\r\n";
+					$headers .= 'From: <no-reply@caed-lab.com>' . "\r\n";
+					
+					mail($to,$subject,$txt,$headers);
+                echo "<script language='javascript' type='text/javascript'>
+								swal({   title: '',   text: 'Email enviado com sucesso',    type: 'success'  });
+							</script>";
+                
 				}
 				           
 //----------Hub de opções para exibição do resumo de avaliações

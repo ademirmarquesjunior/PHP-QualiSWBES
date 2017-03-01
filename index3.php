@@ -100,6 +100,7 @@ include "conecta.php";
 					echo "<div class='panel panel-default'>
 							<div class='panel-heading'><h1>Administrador</h1></div>
 							<div class='panel-body'>
+							<h4><a href='usermanager.php' target='_blank'><span class='glyphicon glyphicon-user'></span> Gerênciar usuários </a></h4>
 							<p>Gerencie usuários e suas permissões<br>
 							Gerencie os sistemas cadastrados - editar/excluir<br>
 							Inserir, editar ou excluir questões<br>
