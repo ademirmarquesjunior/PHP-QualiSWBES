@@ -33,7 +33,7 @@ if(isset($_SESSION['user_login'])) {
         
          function anti_injection($string) {
 				// remove palavras que contenham sintaxe sql
-				$string = preg_replace(sql_regcase("/(from|select|insert|delete|where|drop table|show tables|#|\*|--|\\\\)/"),"",$sql);
+				$string = preg_replace("/(from|FROM|select|SELECT|insert|INSERT|delete|DELETE|where|WHERE|drop table|DROP TABLE|show tables|SHOW TABLES|#|\*|--|\\\\)/","",$string);
 				$string = trim($string);//limpa espaços vazio
 				$string = strip_tags($string);//tira tags html e php
 				$string = addslashes($string);//Adiciona barras invertidas a uma string
@@ -42,7 +42,7 @@ if(isset($_SESSION['user_login'])) {
 			
 //-------Verificar se o valor de validação é válido e pedir nova senha ou ativar o usuário se ele já tiver uma senha			
 			if (isset($_GET['valid'])) {
-				$valid = $_GET['valid'];
+				$valid = anti_injection($_GET['valid']);
 				
 				$Sql = "SELECT * FROM `tbuser` WHERE `tbUserValid` = '".$valid."'";
 				$rs = mysqli_query($conexao, $Sql) or die ("Erro ao buscar usuário");
@@ -67,7 +67,7 @@ if(isset($_SESSION['user_login'])) {
 						</form>';
 					} else {
 						$Sql = "UPDATE `tbuser` SET `tbUserValid` = '1' WHERE `tbuser`.`idtbUser` = ".$user_id;
-						$rs = mysqli_query($conexao, $Sql) or die ("Erro ao atualizar usuário");
+						$rs = mysqli_query($conexao, $Sql) or die ("<br>Erro ao atualizar usuário");
 						$_SESSION['user_login'] = $user;
 						$_SESSION['user_id'] = $user_id;
 						$_SESSION['user_level'] = $user_level;
@@ -77,10 +77,11 @@ if(isset($_SESSION['user_login'])) {
 					}	
 				}
 			}	elseif (isset($_POST['submitUpdatePassword'])) {
-				$user_id = $_POST['txt_user_id'];
+				
+				$user_id = anti_injection($_POST['txt_user_id']);
 				$password = md5($_POST['txt_password1']);
-				$Sql = "UPDATE `tbuser` SET `tbUserPassword` = ".$password." WHERE `tbuser`.`idtbUser` = ".$user_id;
-				$rs = mysqli_query($conexao, $Sql) or die ("Erro ao atualizar usuário");
+				$Sql = "UPDATE `tbuser` SET `tbUserPassword` = '".$password."',`tbUserValid` = '1' WHERE `tbuser`.`idtbUser` = ".$user_id;
+				$rs = mysqli_query($conexao, $Sql) or die ("Erro ao atualizar senha");
 				$_SESSION['user_login'] = $user;
 				$_SESSION['user_id'] = $user_id;
 				$_SESSION['user_level'] = $user_level;
@@ -88,17 +89,12 @@ if(isset($_SESSION['user_login'])) {
 						swal({   title: '',   text: 'Senha alterada com sucesso!',    type: 'success'  },  function(){    window.location.href = 'index3.php';});
 					</script>";
 			}	elseif (isset($_POST['submitNewUser'])) {
-            $user = $_POST['txt_nome'];
-            $email = $_POST['txt_email'];
+            $user = anti_injection($_POST['txt_nome']);
+            $email = anti_injection($_POST['txt_email']);
             $password = md5($_POST['txt_password1']);
-            $valid = md5(time());
+            $valid = md5(time());            
             
-				echo $email;            
-            
-            $Sql = "INSERT INTO `tbuser` (`idtbUser`, `tbUserName`, `tbUserEmail`, `tbUserPassword`, `tbUserLevel`, `tbUserValid`) VALUES (NULL, '" . $user . "', '" . $email . "', '" . $password . "', '1', '".$valid."')";
-            
-            echo $Sql;
-            
+            $Sql = "INSERT INTO `tbuser` (`idtbUser`, `tbUserName`, `tbUserEmail`, `tbUserPassword`, `tbUserLevel`, `tbUserValid`) VALUES (NULL, '" . $user . "', '" . $email . "', '" . $password . "', '1', '".$valid."')";            
             $rs = mysqli_query($conexao, $Sql) or die ("<script language='javascript' type='text/javascript'>
 								swal({   title: '',   text: 'Já existe um usuário com esse email!',    type: 'error'  },  function(){    window.location.href = 'cadastrar.php';});
 							</script>");
@@ -126,6 +122,56 @@ if(isset($_SESSION['user_login'])) {
             } else {
                 echo "<script language='javascript' type='text/javascript'> swal('Erro!'); window.location.href='index.html';</script>";
             }
+        } elseif (isset($_POST['submitEmail'])) {
+        		$email = anti_injection($_POST['txt_email']);
+        		$valid = md5(time());
+        		
+        		$Sql = "SELECT * FROM `tbuser` WHERE tbUserEmail = '".$email."'";
+        		$rs = mysqli_query($conexao, $Sql) or die ("Erro");
+        		$rs = mysqli_query($conexao, $Sql) or die ("Erro ao buscar usuário");
+				
+				if (mysqli_num_rows($rs) == 0) {
+					echo "<script> window.location.assign('index3.php')</script>";	
+				} else {
+					$row = mysqli_fetch_assoc($rs);
+					$user = $row['tbUserName'];
+					$user_id = $row['idtbUser'];
+				}
+        		
+        		$Sql = "UPDATE `tbuser` SET `tbUserPassword` = 0,`tbUserValid` = '".$valid."' WHERE `tbuser`.`idtbUser` = ".$user_id;
+				$rs = mysqli_query($conexao, $Sql) or die ("Erro ao atualizar usuário");
+				
+				if (mysqli_affected_rows($conexao)>0) {			
+					$to = $email;
+					$subject = "[AvaliaQASWebE] Usuário cadastrado";
+					$txt = "<html><head><title>HTML email</title></head>
+						<body>
+						<h3>Olá ".$user."</h3>
+						<p>Foi solicitada a alteração de email para acesso ao sistema de avaliação AvaliaQASWebE. Para saber mais sobre o sistema de avaliação clique <a href='http://avaliasewebs.caed-lab.com/index.php' target='_blank'>aqui</a>.</p>
+						<p>Para entrar com a nova senha clique no link abaixo:</p>
+						<a href='http://avaliasewebs.caed-lab.com/cadastrar.php?valid=".$valid."' target='_blank'>http://avaliasewebs.caed-lab.com/cadastrar.php?valid=".$valid."</a>
+						</body>
+						</html>";
+					$headers = "MIME-Version: 1.0" . "\r\n";
+					$headers .= "Content-type:text/html;charset=UTF-8" . "\r\n";
+					$headers .= 'From: <no-reply@caed-lab.com>' . "\r\n";
+					
+					mail($to,$subject,$txt,$headers);
+					
+                echo "<script language='javascript' type='text/javascript'>
+								swal({   title: '',   text: 'Verifique a sua caixa de email para ativar a sua conta.',    type: 'success'  },  function(){    window.location.href = 'login.php';});
+							</script>";
+            } else {
+                echo "<script language='javascript' type='text/javascript'> swal('Erro!'); window.location.href='index.html';</script>";
+            }
+						
+        } elseif (isset($_GET['password'])) {
+        		echo 'Insira o email cadastrado:
+						<form action="cadastrar.php" method="post" name="form1" class="form-group">
+						<input name="txt_email" id="entravalor4" type="text" class="form-control" required /></p>
+						<p><input value="Enviar" type="submit" name="submitEmail" class="btn btn-default" onclick="return validar()"></p>
+						</form>';
+						
         } else {
             echo '<form action="cadastrar.php" method="post" name="form1" class="form-group">';
             echo '<p>Nome Completo: </p> <p><input maxlength="60" name="txt_nome" id="entravalor2" size="50" class="form-control" required /></p>';

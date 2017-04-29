@@ -38,19 +38,29 @@ if(isset($_SESSION['user_login'])) {
 		<input id="entravalor" class="form-control" name="txt_password" required="" type="password" /></p>
 		<p><input class="btn btn-default" type="submit" value="login"></p>
 	</form>
-	Clique <a href="cadastrar.php">aqui</a> para se cadastrar e ter acesso ao sistema.
+	<p>Clique <a href="cadastrar.php">aqui</a> para se cadastrar e ter acesso ao sistema.</p>
+	
+	<p>Caso tenha esquecido a senha clique <a href="cadastrar.php?password=forgotten">aqui</a>.</p>
 	<?php
 
 	include "conecta.php";
 	
+         function anti_injection($string) {
+				// remove palavras que contenham sintaxe sql
+				$string = preg_replace("/(from|FROM|select|SELECT|insert|INSERT|delete|DELETE|where|WHERE|drop table|DROP TABLE|show tables|SHOW TABLES|#|\*|--|\\\\)/","",$string);
+				$string = trim($string);//limpa espaços vazio
+				$string = strip_tags($string);//tira tags html e php
+				$string = addslashes($string);//Adiciona barras invertidas a uma string
+				return $string;
+			}	
+	
 	if (isset($_POST['txt_user'])) {
-		$user = trim($_POST['txt_user']); 
-		$password = trim($_POST['txt_password']);
+		$user = anti_injection($_POST['txt_user']); 
+		$password = anti_injection($_POST['txt_password']);
 		
 		$password = md5($password);
 		
 		$Sql="SELECT * FROM `tbuser` WHERE `tbuseremail` = '".$user."' AND `tbuserpassword` = '".$password."'";
-		//$Sql = "SELECT * FROM `tbuser` WHERE `tbEmail` = 'admin@admin' AND `tbPassword` = '21232f297a57a5a743894a0e4a801fc3'";
 		$rs = mysqli_query($conexao, $Sql) or die ("<script language='javascript' type='text/javascript'>
 								swal({   title: '',   text: 'Usuário ou senha incoreta!',    type: 'error'  },  function(){    window.location.href = 'login.php';});
 							</script>");
@@ -67,8 +77,15 @@ if(isset($_SESSION['user_login'])) {
 			$_SESSION['user_login'] = $row["tbUserName"];
 			$_SESSION['user_id'] = $row["idtbUser"];
 			$_SESSION['user_level'] = $row["tbUserLevel"];	
-			echo "<script> window.location.assign('index3.php')</script>";
-			//header('Location:index2.php');
+						
+			//Verificar se o usuário já tem perfil preenchido			
+			$Sql = "SELECT * FROM `tbuserprofile` WHERE `tbUser_idtbUser` = ".$_SESSION['user_id'];
+			$rs = mysqli_query($conexao, $Sql);			
+			if(mysqli_num_rows($rs) == 1) {
+				echo "<script> window.location.assign('index3.php')</script>";
+			} else {
+				echo "<script> window.location.assign('profile.php')</script>";
+			}
 			
 		} else { 
 			echo "<script language='javascript' type='text/javascript'>

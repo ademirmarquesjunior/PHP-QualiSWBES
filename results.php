@@ -9,12 +9,14 @@ include "function.inc.php";
 
    <head>
       <meta content="text/html; charset=utf-8" http-equiv="content-type" />
-      <link href="css/bootstrap.min.css" rel="stylesheet">
-      <link href="css/style.css" rel="stylesheet">
-      <script src="js/Chart.min.js"></script>
-      <script src="js/sweetalert.js"></script>
-      <link rel="stylesheet" href="css/sweetalert.css">
-      <link rel="icon" type="image/png" href="favicon.png">
+        <link href="css/bootstrap.min.css" rel="stylesheet">
+        <link href="css/style.css" rel="stylesheet">
+        <link rel="stylesheet" href="css/sweetalert.css">
+        <script src="js/jquery-3.1.1.min.js"></script>        
+        <script src="js/bootstrap.min.js"></script>
+        <script src="js/Chart.bundle.min.js"></script>
+			<script src="js/sweetalert.js"></script>
+        <link rel="icon" type="image/png" href="favicon.png">
       <title>Avalia SEWebS</title>
    </head>
 
@@ -23,13 +25,11 @@ include "function.inc.php";
             <?php
             include 'header.php';
             include 'navbar.php';
-            ?>
-
-            <?php
+            
             if (isset($_GET['form']) AND is_numeric($_GET['form']) AND !isset($_GET['applic']))  {
                   //Verificar se o formulário existe
                   $Sql = "SELECT * FROM tbform INNER JOIN tbapplication ON tbapplication.idtbApplication = tbform.tbApplication_idtbApplication INNER JOIN tbusertypetext ON tbform.tbUserType_idtbUserType = tbusertypetext.tbUserType_idtbUserType INNER JOIN tbuser ON tbform.tbUser_idtbUser = tbuser.idtbUser WHERE tbform.idtbForm = " . $_GET['form']."  AND tblanguage_idtblanguage =  ".$_SESSION['language'];
-                  $rs = mysqli_query($conexao, $Sql);
+                  $rs = mysqli_query($conexao, $Sql) or die ('Erro amarelo');
                   $i = 0;
                   $completed = 0;
                   $applic_id = 0;
@@ -101,30 +101,7 @@ include "function.inc.php";
             			echo '</p>';
             			          			
             			
-						}
-						$Sql = "SELECT * FROM `tblearningobjects` WHERE tbApplication_idtbApplication = " . $applic_id;
-				         $rs = mysqli_query($conexao, $Sql);
-				         if (mysqli_num_rows($rs) == 0) {
-				             echo "<p>Não há Objetos de aprendizagem avaliados</p>";
-				         } else {
-				         	echo '<p><strong>Objetos de Aprendizagem avaliados:</strong><br>';
-				             while ($row = mysqli_fetch_assoc($rs)) {
-				                 echo '<span class="glyphicon glyphicon-unchecked"></span> '.$row['tbLearningObjectsName'].'<br>';
-				             }
-				             echo '</p>';
-				         }  
-				         
-				         $Sql = "SELECT * FROM `tbOntologies` WHERE tbApplication_idtbApplication = " . $applic_id;
-				         $rs = mysqli_query($conexao, $Sql);
-				         if (mysqli_num_rows($rs) == 0) {
-				             echo "<p>Não há Objetos de aprendizagem avaliados</p>";
-				         } else {
-				         	echo '<p><strong>Ontologias avaliadas:</strong><br>';
-				             while ($row = mysqli_fetch_assoc($rs)) {
-				                 echo '<span class="glyphicon glyphicon-unchecked"></span> '.$row['tbOntologiesName'].'<br>';
-				             }
-				             echo '</p>';
-				         }                             
+						}                     
  						?>
                </div>
             </div>
@@ -137,6 +114,8 @@ include "function.inc.php";
             $texts = array();
             $counter = array();
             $resultados_exp = array();
+            $graph_id = 0;
+            $loadgraph = '';
 
             $Sql = "SELECT * FROM `tbobjectives` INNER JOIN tbobjectivestext ON tbobjectives.idtbObjectives = tbobjectivestext.tbobjectives_idtbobjectives WHERE tblanguage_idtblanguage = ".$_SESSION['language'];
             //echo $Sql;
@@ -160,108 +139,113 @@ include "function.inc.php";
                $counter[$linha["idtbObjectives"]] = $resultados[$linha["idtbObjectives"]][4];
                $resultados_exp[$linha["idtbObjectives"]] = detalhaResultados($resultados[$linha["idtbObjectives"]]);
             }
-            ?>
-            <div class="panel panel-default">
+            
+
+                        
+                     
+		   for ($i = 1; $i < 2; $i++) {
+		      if ($values[$i-1] != 0) {
+		               $artifact_value = $resultados_exp[$i][0];
+		               $artifact_name = $resultados_exp[$i][1];
+		               
+		               $Factor_name = $resultados_exp[$i][3];
+		               $Factor_value = $resultados_exp[$i][2];
+		               
+		               $subFactor_name = $resultados_exp[$i][5];
+		               $subFactor_value = $resultados_exp[$i][4];
+		               
+		               //Gerar dados para o gráfico de fatores
+		               $sum_factor = array();
+		               $count_factor = array();
+		               $names_factor = array();
+		               for ($k = 0; $k < 6; $k++) {
+		               	if (array_key_exists($k,  $Factor_value)) {
+		               		foreach ($Factor_name[$k] as $key => $value){
+		               			if ( ! isset($sum_factor[$key])) $sum_factor[$key] = null;
+										if ( ! isset($count_factor[$key])) $count_factor[$key] = null;
+										
+		                  		$sum_factor[$key] =  $sum_factor[$key] + $Factor_value[$k][$key];
+		                  		$count_factor[$key]++;
+		               		}
+		               		$names_factor = $names_factor + $Factor_name[$k];
+		               	}
+		               }
+		               
+		               foreach ($sum_factor as $key => $value){
+								$sum_factor[$key] = $sum_factor[$key]/$count_factor[$key];                                    
+		               } 
+		               
+		               $mean_factor = array_sum($sum_factor)/count($sum_factor);
+		               
+            echo '<div class="panel panel-default">
                <div class="panel-body">
-
                   <div class="row">
-                        <div class="col-md-4">
+                        <div class="col-md-6">
                            <h2>Visão Geral 
-                           <strong><?php printf("%0.2f %% :", array_sum($values) / count(array_filter($values))); ?></strong></h2>
-                           <canvas id="Geral" style="width:100%;"></canvas>
-                           <?php
-                           $loadgraph = '';
-
-                           echo '
-                  <script type="text/javascript">
-               var options = {
-               	responsive:true,
-               	scaleOverride:true,
-               	scaleSteps:10,
-               	scaleStartValue:0,
-               	scaleStepWidth:10
-               };
-
-               var data = {
-                  labels: [';
-                           foreach ($names as $name) {
-                              echo '"' . $name . '",';
-                           }
-                           echo '],
-                  datasets: [
-                        {
-                           label: "Dados primários",
-                           fillColor: "rgba(102, 153, 255,0.5)",
-                           strokeColor: "rgba(220,220,220,0.8)",
-                           highlightFill: "rgba(220,220,220,0.75)",
-                           highlightStroke: "rgba(220,220,220,1)",
-                           data: [';
-                           foreach ($values as $value) {
-                              //echo json_encode($value) . ',';
-                              printf("%0.2f,",$value);
-                           }
-                           echo ']
-                        }
-                  ]
-               }</script>;';
+                           <strong>';
+                           printf("%0.2f %% :", $mean_factor);
+                           echo '</strong></h2>';
+                           
+                           echo "<h2>";
+                           if ($mean_factor < 50){
+                           	echo "O sistema é inadequado!";
+                           } elseif ($mean_factor < 75) {
+                           	echo "O sistema é adequado com restrições!";
+                           } else { 
+                           	echo "O sistema é adequado!";
+                        	}		               
+		               		echo "</h2>";
+		               		echo '<progress value="'.$mean_factor.'" max="100"></progress>';
+		               		               
+		               
+		               $graph_id = $graph_id + 1;				
+							graficoRadar($names_factor, $sum_factor, $graph_id);
+							$loadgraph = $loadgraph . 'var ctx' . $graph_id . ' = document.getElementById("Geral' . $graph_id . '").getContext("2d");
+		var GeralChart' . $graph_id . ' = new Chart(ctx' . $graph_id . ').Radar(data' . $graph_id . ', options' . $graph_id . ');';
+		                  
+		               echo '</div>
+				               
+				            </div>
+				         
+                     <div class="row">';                               
+		               echo '<div class="col-md-8">';
+		               echo '<h2>Artefatos avaliados</h2><p>';
+		               echo 'Questões respondidas <strong>'.$counter[1];
+		               echo '</strong><p>';
+		               //echo $texts[$i-1].'</p>';
+		               
+		               $graph_id = $graph_id + 1;
+		               graficoBarra2($artifact_name,$artifact_value,$graph_id);
+		            	
+		            	 echo '</div>';
+		            	 echo  '';                             	
+		            	
+		            	foreach (array_keys($artifact_name) as $key) {
+		            			echo '<div class="row"><div class="col-md-6">';											      
+							      echo '<h3>' . $artifact_name[$key] . '</h3>';
+							      
+							      
+							      $graph_id = $graph_id + 1;				
+									graficoBarra2($Factor_name[$key], $Factor_value[$key], $graph_id);
+									echo '</div>'; 
 									
-                           $loadgraph = $loadgraph . 'var ctx = document.getElementById("Geral").getContext("2d");
-                  var geralChart = new Chart(ctx).Radar(data, options);';
-                           ?>
-
-                        </div>
-               </div>
-            </div>
-         </div>
-                     <div class="row">
-                           <?php
-                              for ($i = 1; $i < 5; $i++) {
-                           if ($values[$i-1] != 0) {
-                                    $artifact_value = $resultados_exp[$i][0];
-                                    $artifact_name = $resultados_exp[$i][1];
-                                    echo ' <div class="col-md-6"><div class="panel panel-default"><div class="panel-body">
-';
-                                    echo '<h2>' . $names[$i-1] ." ";
-                                    printf("%0.2f%% ", $values[$i-1]);
-                                    echo '</h2><p>';
-                                    //echo 'Questões nessa categoria <strong>'.$counter[$i];
-                                    echo '</strong><p>';
-                                    echo $texts[$i-1].'</p>';
-                                    //echo '</p><p>Os seguintes Artefatos foram avaliados para alcançar este objetivos. Cada artefato ainda é detalhado em fatores e subfatores avaliados:</p>';
-                                    echo '<canvas id="GraficoArtefato' . $i . '" style="width:100%;"></canvas>';
-                                    echo '
-                  <script type="text/javascript">
-               var options' . $i . ' = { responsive:true, scaleOverride:true, scaleSteps:10, scaleStartValue:0, scaleStepWidth:10, display:true };
-
-               var data' . $i . ' = {
-                  labels: [';
-                                    foreach ($artifact_name as $name) {
-                                       echo '"' . $name . '",';
-                                    }
-                                    echo '],
-                  datasets: [
-                        {
-                           label: "Dados primários",
-                           fillColor: "rgba(51, 51, 153, 0.6)",
-                           strokeColor: "rgba(220,220,220,0.8)",
-                           highlightFill: "rgba(140, 140, 217,0.75)",
-                           highlightStroke: "rgba(220,220,220,1)",
-                           data: [';
-                                    foreach ($artifact_value as $value) {
-                                       //echo json_encode($value) . ',';
-                                       printf("%0.2f,",$value);
-                                    }
-                                    echo ']
-                        }
-                  ]
-               };</script>';
-                                    $loadgraph = $loadgraph . 'var ctx' . $i . ' = document.getElementById("GraficoArtefato' . $i . '").getContext("2d");
-               var BarChart' . $i . ' = new Chart(ctx' . $i . ').Bar(data' . $i . ', options' . $i . ');';
-               
-                           echo '</div></div></div>';
-                           }
-                        }
-                              ?>
+									
+									foreach (array_keys($Factor_name[$key]) as $key2) {
+										echo '<div class="col-md-4">';
+										echo '<h4>'.$Factor_name[$key][$key2].'</h4>';
+										
+										$graph_id = $graph_id + 1;				
+										graficoPolar($subFactor_name[$key][$key2], $subFactor_value[$key][$key2], $graph_id);										
+										echo '</div>';
+									}
+									
+									echo '</div>';
+								
+						   }
+		      	echo '</div></div></div></div>';
+		      }
+		   }
+               ?>
                         </div>
             <?php
             include 'footer.php';

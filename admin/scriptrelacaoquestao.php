@@ -31,13 +31,13 @@ if (isset($_GET['submitRelationDel'])) {
 	
 }
 
-$Sql0 = "SELECT * FROM tbuserquestion WHERE tbuserquestion.idtbUserQuestion >= 65 AND tbuserquestion.idtbUserQuestion <= 70 ";
+$Sql0 = "SELECT * FROM tbuserquestion WHERE tbuserquestion.idtbUserQuestion >= 53 AND tbuserquestion.idtbUserQuestion <= 63 ";
 $rs0 = mysqli_query($conexao, $Sql0) or die ("Erro");
 while($linha0 = mysqli_fetch_array($rs0, MYSQLI_ASSOC)){
 	
-	$user = 4; //Engenheiro do Conhecimento + Autor: 1 . Autor: 2. Usuário: 3. Desenvolvedor: 4.
-	$objective = 3; //Entrega e Distribuição: 1; Acesso: 2; Capacidade de Resposta: 3; Dinâmica de Aprendizagem: 4;.
-	$weight = 2;
+	$user = 2; //Engenheiro do Conhecimento + Autor: 1 . Autor: 2. Usuário: 3. Desenvolvedor: 4.
+	$objective = 1; //Entrega e Distribuição: 1; Acesso: 2; Capacidade de Resposta: 3; Dinâmica de Aprendizagem: 4;.
+	$weight = 1;
 	$question = $linha0['idtbUserQuestion'];
 
 	if (($user != "") AND ($objective != "")) {

@@ -1,15 +1,21 @@
 <?php session_start(); 
 include "language.php";
 ?>
-<!DOCTYPE html>
-<head>
-<meta content="text/html; charset=utf-8" http-equiv="content-type" />
-<!-- <link rel="stylesheet" href="estilo.css" type="text/css" media="screen" /> -->
-<link href="css/bootstrap.min.css" rel="stylesheet" />
-<link href="css/style.css" rel="stylesheet" />
-<link rel="icon" type="image/png" href="favicon.png">
-<title>Avalia SEWebS</title>
-</head>
+<html>
+    <head>
+        <meta content="text/html; charset=utf-8" http-equiv="content-type" />
+        <link href="css/bootstrap.min.css" rel="stylesheet">
+        <link href="css/style.css" rel="stylesheet">
+        <link rel="stylesheet" type="text/css" href="slider/rzslider.css"/>
+        <link rel="stylesheet" href="css/sweetalert.css">
+        <script src="js/jquery-3.1.1.min.js"></script>        
+        <script src="js/bootstrap.min.js"></script>
+			<script src="js/sweetalert.js"></script>
+			<script src="slider/angular.min.js"></script>
+			<script src="slider/rzslider.min.js"></script>
+        <link rel="icon" type="image/png" href="favicon.png">
+        <title>Avalia SEWebS</title>
+    </head>
 <body>
 
 <div class="container-fluid">

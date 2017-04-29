@@ -39,6 +39,15 @@ include "conecta.php";
             
 //----------Funções
 
+         function anti_injection($string) {
+				// remove palavras que contenham sintaxe sql
+				$string = preg_replace("/(from|FROM|select|SELECT|insert|INSERT|delete|DELETE|where|WHERE|drop table|DROP TABLE|show tables|SHOW TABLES|#|\*|--|\\\\)/","",$string);
+				$string = trim($string);//limpa espaços vazio
+				$string = strip_tags($string);//tira tags html e php
+				$string = addslashes($string);//Adiciona barras invertidas a uma string
+				return $string;
+			}
+
 //----------Apagar questões
 				function eraseQuestions ($form_id, $applic_id) {
 					include "conecta.php";
@@ -64,8 +73,8 @@ include "conecta.php";
 
 //----------Insere aplicação 
             if (isset($_POST['txt_aplic'])) {
-                $applic_name = $_POST['txt_aplic'];
-                $applic_text = $_POST['txt_aplicdesc'];
+                $applic_name = anti_injection($_POST['txt_aplic']);
+                $applic_text = anti_injection($_POST['txt_aplicdesc']);
                 $applic_id = NULL;
 
                 $Sql = "SELECT * FROM tbapplication WHERE tbapplicationname = '" . $applic_name . "' AND tbUser_idtbUser = '" . $user . "'";
@@ -92,8 +101,8 @@ include "conecta.php";
 
 //----------Selecionar a aplicação
             if (isset($_GET['applic_id']) OR isset($_POST['applic_id'])) {
-                if (isset($_GET['applic_id'])) $applic_id = $_GET['applic_id'];
-                if (isset($_POST['applic_id'])) $applic_id = $_POST['applic_id'];
+                if (isset($_GET['applic_id'])) $applic_id = anti_injection($_GET['applic_id']);
+                if (isset($_POST['applic_id'])) $applic_id = anti_injection($_POST['applic_id']);
 
                 $Sql = "SELECT * FROM tbapplication WHERE idtbApplication = " . $applic_id . " AND tbUser_idtbUser = '" . $user . "'";
                 $rs = mysqli_query($conexao, $Sql);
@@ -119,8 +128,8 @@ include "conecta.php";
 //----------incluir usuário na lista de formulários
 				if (isset($_POST['submitAddUser'])) {
 					//print_r($_POST);
-					$user_type = $_POST['sel_user_type'];
-					$user_id = $_POST['sel_user'];
+					$user_type = anti_injection($_POST['sel_user_type']);
+					$user_id = anti_injection($_POST['sel_user']);
 					
 					if ($user_id == '' OR $user_id == '') echo "<script> window.history.back()</script>";					
 					//echo "inclui usuario";
@@ -134,8 +143,8 @@ include "conecta.php";
 				
 //----------Exluir usuário da lista de formulários
 				if (isset($_POST['submitDelUser'])) {
-                $applic_id = $_POST['applic_id'];
-                $form_id = $_POST['form_id'];
+                $applic_id = anti_injection($_POST['applic_id']);
+                $form_id = anti_injection($_POST['form_id']);
                 
                 eraseQuestions($form_id, $user);
                 eraseForm ($form_id, $user, $applic_id);
@@ -143,8 +152,8 @@ include "conecta.php";
 
 //----------Excluir questões respondidas
 				if (isset($_POST['submitDelForm'])) {
-                $applic_id = $_POST['applic_id'];
-                $form_id = $_POST['form_id'];
+                $applic_id = anti_injection($_POST['applic_id']);
+                $form_id = anti_injection($_POST['form_id']);
                 
                 eraseQuestions($form_id, $user);
                 
@@ -152,8 +161,8 @@ include "conecta.php";
 				
 //----------Excluir Objetos de Aprendizagem
 				if (isset($_POST['submitDelLearningObject'])) {
-                $applic_id = $_POST['applic_id'];
-                $learning_object = $_POST['LearningObject_id'];
+                $applic_id = anti_injection($_POST['applic_id']);
+                $learning_object = anti_injection($_POST['LearningObject_id']);
                                 
                 $Sql = "DELETE FROM `tblearningobjects` WHERE `tblearningobjects`.`idLearningObjects` = ".$learning_object." AND `tblearningobjects`.`tbApplication_idtbApplication` = ".$applic_id;
                 $rs = mysqli_query($conexao, $Sql) or die ("Erro ao apagar Objeto de Aprendizagem");
@@ -168,8 +177,8 @@ include "conecta.php";
 	
 //----------Excluir Ontologias
 				if (isset($_POST['submitDelOntology'])) {
-                $applic_id = $_POST['applic_id'];
-                $ontology = $_POST['ontology_id'];
+                $applic_id = anti_injection($_POST['applic_id']);
+                $ontology = anti_injection($_POST['ontology_id']);
                 
                 $Sql = "DELETE FROM `tbontologies` WHERE `tbontologies`.`idOntologies` = ".$ontology." AND `tbontologies`.`tbApplication_idtbApplication` = ".$applic_id;
                 $rs = mysqli_query($conexao, $Sql) or die ("Erro ao apagar ontologia");
@@ -184,7 +193,7 @@ include "conecta.php";
 //----------Inserir objeto de aprendizagem
 				if (isset($_POST['submitLearningObject'])) {
 					if ($_POST['learningobject_text'] == '') echo "<script> window.history.back()</script>"; 
-					$learning_object = $_POST['learningobject_text'];
+					$learning_object = anti_injection($_POST['learningobject_text']);
 					
 				
 					$Sql = "INSERT INTO `tblearningobjects` (`idLearningObjects`, `tbLearningObjectsName`, `tbLearningObjectsDesc`, `tbApplication_idtbApplication`) VALUES (NULL, '".$learning_object."', NULL, '".$applic_id."')";
@@ -195,7 +204,7 @@ include "conecta.php";
 //----------Inserir ontologias
 				if (isset($_POST['submitOntology'])) {
 					if ($_POST['ontology_text'] == '') echo "<script> window.history.back()</script>"; 
-					$ontology = $_POST['ontology_text'];
+					$ontology = anti_injection($_POST['ontology_text']);
 					
 					$Sql = "INSERT INTO `tbontologies` (`idOntologies`, `tbOntologiesName`, `tbOntologiesText`, `tbApplication_idtbApplication`) VALUES (NULL, '".$ontology."', NULL, '".$applic_id."')";
 					$rs = mysqli_query($conexao, $Sql) or die ("Erro na inserção");
@@ -203,8 +212,8 @@ include "conecta.php";
 				
 //----------Notificar usuário
 				if (isset($_POST['submitNotifyUser'])) {
-					 $applic_id = $_POST['applic_id'];
-                $form_id = $_POST['form_id'];
+					 $applic_id = anti_injection($_POST['applic_id']);
+                $form_id = anti_injection($_POST['form_id']);
                 
                 $Sql = "SELECT * FROM `tbform` INNER JOIN tbuser ON tbform.tbUser_idtbUser = tbuser.idtbUser INNER JOIN tbusertypetext ON tbform.tbUserType_idtbUserType = tbusertypetext.tbUserType_idtbUserType WHERE tbusertypetext.tbLanguage_idtbLanguage = 1 AND tbform.tbApplication_idtbApplication =" . $applic_id;
 	            $rs = mysqli_query($conexao, $Sql);
@@ -255,14 +264,16 @@ include "conecta.php";
             if (mysqli_num_rows($rs) == 0) {
                 echo "<p>Não há usuários cadastrados</p>";
             } else {
+            	echo '<table class="table table-bordered table-condensed table-hover">';
                 while ($row = mysqli_fetch_assoc($rs)) {
                     echo '<form method="post" action="evaluationeditor.php">
+                    <tr><td>
 							<strong>'.$row['tbUserName'].'</strong> como <strong>'.$row['tbUserTypeDesc'].'</strong>';
-							if ($row['tbFormCompleted'] == '1') { echo ' - Terminado'; }
-							echo '<br>
+							if ($row['tbFormCompleted'] == '1') { echo ' - Concluído'; }
+							echo '</td><td>
 							<input name="applic_id" value="'.$applic_id.'" size="12" type="text" hidden/>
 							<input name="form_id" value="'.$row['idtbForm'].'" size="12" type="text" hidden/>
-							<button type="submit" class="btn btn-danger btn-sm" name="submitDelUser" data-toggle="tooltip" data-placement="bottom" title="Excluir avaliador para a avaliação. Exclui avaliação já terminada!"> <span class="glyphicon glyphicon-remove"></span> </button>
+							<div style="text-align: right;"><button type="submit" class="btn btn-danger btn-sm" name="submitDelUser" data-toggle="tooltip" data-placement="bottom" title="Excluir avaliador para a avaliação. Exclui avaliação já terminada!"> <span class="glyphicon glyphicon-remove"></span> </button>
 							<button type="submit" class="btn btn-default btn-sm ';
 							if ($row['tbFormCompleted'] == '1') { echo ' disabled'; }
 							echo '" name="submitNotifyUser" data-toggle="tooltip" data-placement="bottom" title="Notifique o usuário de avaliações pendentes!"> <span class="glyphicon glyphicon-info-sign"></span></button>
@@ -270,12 +281,13 @@ include "conecta.php";
 							<a class="btn btn-info btn-sm';
 							if ($row['tbFormCompleted'] == '0') { echo ' disabled'; }
 							echo '" href="results.php?form='.$row['idtbForm'].'" target="_blank" data-toggle="tooltip" data-placement="bottom" title="Visialize o resumo do formulário já terminado em uma nova página."> <span class="glyphicon glyphicon-zoom-in"></span> </a>';							
-							echo '</form><hr>';
+							echo '</div></td></tr></form>';
                 }
+                echo '</table>';
             }
 
 				//echo '<br><h3>Inclua usuários:</h3>';
-            echo '<form method="post" action="evaluationeditor.php" class="form form-inline">';
+            echo '<hr><form method="post" action="evaluationeditor.php" class="form form-inline">';
             echo '<input name="applic_id" value="'.$applic_id.'" size="12" type="text" hidden/>';
             
             echo '<select name="sel_user" id="user" class="form-control">';
@@ -313,14 +325,17 @@ include "conecta.php";
             if (mysqli_num_rows($rs) == 0) {
                 echo "<p>Não há Objetos de aprendizagem cadastrados</p>";
             } else {
+            	echo '<table class="table table-bordered table-condensed table-hover">';
                 while ($row = mysqli_fetch_assoc($rs)) {
                     echo '<form method="post" action="evaluationeditor.php">
                     <input name="applic_id" value="'.$applic_id.'" size="12" type="text" hidden/>
                     <input name="LearningObject_id" value="'.$row['idLearningObjects'].'" size="12" type="text" hidden/>
-                    <strong>'.$row['tbLearningObjectsName'].'</strong>
-                    <button type="submit" class="btn btn-danger btn-sm" name="submitDelLearningObject" data-toggle="tooltip" data-placement="bottom" title="Excluir Objetos de Aprendizagem exclui avaliações já terminadas anteriormente!"> <span class="glyphicon glyphicon-remove"></span> </button>
+                    <tr><td>
+                    <strong>'.$row['tbLearningObjectsName'].'</strong></td>
+                    <td><div style="text-align: right;"><button type="submit" class="btn btn-danger btn-sm" name="submitDelLearningObject" data-toggle="tooltip" data-placement="bottom" title="Excluir Objetos de Aprendizagem exclui avaliações já terminadas anteriormente!"> <span class="glyphicon glyphicon-remove"></span> </button></div></td></tr>
                     </form>';
                 }
+                echo '</table>';
             }
             
            
@@ -343,13 +358,16 @@ include "conecta.php";
             if (mysqli_num_rows($rs) == 0) {
                 echo "<p>Não há Ontologias cadastradas</p>";
             } else {
+            	echo '<table class="table table-bordered table-condensed table-hover">';
                 while ($row = mysqli_fetch_assoc($rs)) {
                     echo '<form method="post" action="evaluationeditor.php">
                     <input name="applic_id" value="'.$applic_id.'" size="12" type="text" hidden/>
                     <input name="ontology_id" value="'.$row['idOntologies'].'" size="12" type="text" hidden/>
-                    <strong>'.$row['tbOntologiesName'].'</strong>
-                    <button type="submit" class="btn btn-danger btn-sm" name="submitDelOntology" data-toggle="tooltip" data-placement="bottom" title="Excluir Ontologias exclui avaliações já terminadas anteriormente!"> <span class="glyphicon glyphicon-remove"></span> </button></form>';
+                    <tr><td>
+				        <strong>'.$row['tbOntologiesName'].'</strong></td>
+                    <td><div style="text-align: right;"><button type="submit" class="btn btn-danger btn-sm" name="submitDelOntology" data-toggle="tooltip" data-placement="bottom" title="Excluir Ontologias exclui avaliações já terminadas anteriormente!"> <span class="glyphicon glyphicon-remove"></span> </button></form></div></td></tr>';
                 }
+                echo '</table>';
             }
             
             
@@ -362,8 +380,8 @@ include "conecta.php";
             echo "</div></div>";
             
             ?>
-
             <hr>
+
 
 <?php
 include 'footer.php';

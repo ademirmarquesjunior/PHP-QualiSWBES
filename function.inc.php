@@ -75,14 +75,14 @@ function detalhaResultados ($resultados) {
 	    			$subFactor_value[$i][$j][$k] = $result;
 	    			$subFactor_name[$i][$j][$k] = $subFactor;
     			}
-    	   	}	
+    	   }	
 		
 		
         	$Sql = "SELECT * FROM `tbfactor` INNER JOIN tbfactortext ON tbfactor.idtbfactor = tbfactortext.tbfactor_idtbfactor WHERE idtbfactor = ".$j." AND tblanguage_idtblanguage = ".$_SESSION['language'];
         	$rs = mysqli_query($conexao, $Sql);
-            	while ($linha = mysqli_fetch_array($rs, MYSQLI_ASSOC)) {
-            		//echo "<strong>".$rr['tbFactorDesc']."</strong> "; 
-            		$Factor = $linha['tbFactorName'];
+         while ($linha = mysqli_fetch_array($rs, MYSQLI_ASSOC)) {
+            //echo "<strong>".$rr['tbFactorDesc']."</strong> "; 
+            $Factor = $linha['tbFactorName'];
 			}
 			if ($Factor_weight != 0){
 				$result = $Factor_sum/$Factor_weight*20;
@@ -115,5 +115,225 @@ function detalhaResultados ($resultados) {
 
 }
 
+function graficoBarra ($names, $values, $id) {	
+	echo '<canvas id="GraficoArtefato' . $id . '" style="width:85%;"></canvas>';
+   echo '<script type="text/javascript">
+			var options' . $id . ' = { responsive:true, scaleOverride:true, scaleSteps:10, scaleStartValue:0, scaleStepWidth:10, display:true };
+	var data' . $id . ' = {
+				labels: [';
+   foreach ($names as $name) {
+      echo '"' . $name . '",';
+   }
+   echo '],
+   datasets: [
+         {
+            label: "Dados primários",
+            fillColor: "rgba(51, 100, 153, 0.4)",
+            strokeColor: "rgba(51, 100, 153, 1)",
+            highlightFill: "rgba(51, 100, 153, 1)",
+            highlightStroke: "rgba(220,220,220,1)",
+            data: [';
+   foreach ($values as $value) {
+      //echo json_encode($value) . ',';
+      printf("%0.2f,",$value);
+   }
+   echo ']
+         }
+   ]
+};</script>';
+//$loadgraph = $loadgraph . 'var ctx' . $id . ' = document.getElementById("GraficoArtefato' . $id . '").getContext("2d"); var BarChart' . $id . ' = new Chart(ctx' . $id . ').Bar(data' . $id . ', options' . $id . ');';
 
+}
+
+function graficoBarra2 ($names, $values, $id) {
+	echo "
+<canvas id='myChart".$id."' ></canvas>
+<script>
+var ctx".$id." = document.getElementById('myChart".$id."');
+var myChart".$id." = new Chart(ctx".$id.", {
+    type: 'bar',
+    data: {
+        labels: [";
+        foreach ($names as $name) {
+      	echo "'" . $name . "',";
+   		}
+        echo "],
+        datasets: [{
+            label: '',
+            data: [";
+            foreach ($values as $value) {
+			      //echo json_encode($value) . ',';
+			      printf("%0.2f,",$value);
+			   }
+            echo "],
+            backgroundColor: [
+                'rgba(255, 99, 132, 0.2)',
+                'rgba(54, 162, 235, 0.2)',
+                'rgba(255, 206, 86, 0.2)',
+                'rgba(75, 192, 192, 0.2)',
+                'rgba(153, 102, 255, 0.2)',
+                'rgba(255, 159, 64, 0.2)'
+            ],
+            borderColor: [
+                'rgba(255,99,132,1)',
+                'rgba(54, 162, 235, 1)',
+                'rgba(255, 206, 86, 1)',
+                'rgba(75, 192, 192, 1)',
+                'rgba(153, 102, 255, 1)',
+                'rgba(255, 159, 64, 1)'
+            ],
+            borderWidth: 1
+        }]
+    },
+    options: {
+    	legend: {
+			display: false,
+					labels: {
+						display: false
+					}    	
+    	},
+        scales: {
+            yAxes: [{
+                ticks: {
+                    beginAtZero:true,
+                    max: 100,
+                    min: 0
+                }
+            }]
+        }
+    }
+});
+</script>
+	";	
+}
+
+
+function graficoRadar ($names, $values, $id) {
+	echo '<canvas id="myRadarChart'.$id.'" style="width:90%;"></canvas>
+	      <script type="text/javascript">
+	      var ctx'.$id.' = document.getElementById("myRadarChart'.$id.'");
+	      var myRadarChart'.$id.' = new Chart(ctx'.$id.', {
+   			 type: "radar",
+	      data: {
+	         labels: [';
+	                  foreach ($names as $name) {
+	                     echo '"' . $name . '",';
+	                  }
+	                  echo '],
+	         datasets: [
+	               {
+	                  label: "Dados primários",
+	                  backgroundColor: "rgba(200, 153, 255,0.8)",
+	                  borderColor: "rgba(50,50,50,0.8)",
+	                  borderWidth: 1,
+	                  data: [';
+	                  foreach ($values as $value) {
+	                     //echo json_encode($value) . ',';
+	                     printf("%0.2f,",$value);
+	                  }
+	                  echo ']
+	               }
+	         ]},
+	       options: {
+	       	defaultFontSize: 12,
+	      	responsive:true,
+	      	legend: {
+	      		display: false,
+					labels: {
+						display: false
+					}	      	
+	      	
+	      	},
+      	
+	      	scale: {
+		                ticks: {
+		                    beginAtZero: true,
+		                    max: 100,
+		                    display: true,
+		                    fontSize: 12
+		                },
+		                pointLabels: {
+									fontSize: 18
+		                }  
+		        }
+	      }
+	      });</script>;';
+}
+
+
+function graficoPolar ($names, $values, $id) {
+	echo '<canvas id="myPolarChart'.$id.'" style="width:40%;"></canvas>
+	      <script type="text/javascript">
+	      var ctx'.$id.' = document.getElementById("myPolarChart'.$id.'");
+	      var myPolarChart'.$id.' = new Chart(ctx'.$id.', {
+   			 type: "polarArea",
+	      data: {
+	         labels: [';
+	                  foreach ($names as $name) {
+	                     echo '"' . $name . '",';
+	                  }
+	                  echo '],
+	         datasets: [
+	               {
+	                  label: "Dados primários",
+	                  backgroundColor: [
+                "rgba(255, 99, 132, 0.2)",
+                "rgba(54, 162, 235, 0.2)",
+                "rgba(255, 206, 86, 0.2)",
+                "rgba(75, 192, 192, 0.2)",
+                "rgba(153, 102, 255, 0.2)",
+                "rgba(255, 159, 64, 0.2)"
+            ],
+            borderColor: [
+                "rgba(255,99,132,1)",
+                "rgba(54, 162, 235, 1)",
+                "rgba(255, 206, 86, 1)",
+                "rgba(75, 192, 192, 1)",
+                "rgba(153, 102, 255, 1)",
+                "rgba(255, 159, 64, 1)"
+            ],
+            borderWidth: 1,
+	                  data: [';
+	                  foreach ($values as $value) {
+	                     //echo json_encode($value) . ',';
+	                     printf("%0.2f,",$value);
+	                  }
+	                  echo ']
+	               }
+	         ]},
+	       options: {
+	       	defaultFontSize: 12,
+	      	responsive:true,
+	      	legend: {
+	      		display: true,
+					labels: {
+						display: true
+					}	      	
+	      	
+	      	},
+      	
+	      	scale: {
+		                ticks: {
+		                    beginAtZero: true,
+		                    max: 100,
+		                    display: true,
+		                    fontSize: 12
+		                },
+		                pointLabels: {
+									fontSize: 18
+		                }  
+		        }
+	      }
+	      });</script>;';
+}
+
+
+function anti_injection($string) {
+	// remove palavras que contenham sintaxe sql
+	$string = preg_replace("/(from|FROM|select|SELECT|insert|INSERT|delete|DELETE|where|WHERE|drop table|DROP TABLE|show tables|SHOW TABLES|#|\*|--|\\\\)/","",$string);
+	$string = trim($string);//limpa espaços vazio
+	$string = strip_tags($string);//tira tags html e php
+	$string = addslashes($string);//Adiciona barras invertidas a uma string
+	return $string;
+}
 ?>
