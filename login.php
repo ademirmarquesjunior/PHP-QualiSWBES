@@ -4,6 +4,7 @@ if(isset($_SESSION['user_login'])) {
 	//header('Location:index.php');
 	exit();
 } 
+include "language.php";
 ?>
 <!DOCTYPE html>
 <html>

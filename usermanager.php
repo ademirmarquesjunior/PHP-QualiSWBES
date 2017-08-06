@@ -186,18 +186,16 @@ include "conecta.php";
 						if ($row['tbUserValid'] != 1) { echo 'não validado'; }
 						echo '</td>';
 						
-						echo '<td></td>';						
+						echo '<td>';
+						if ($row['tbUserManagerRequest'] == 1) { echo 'SIM'; }
+						echo '</td>';						
 						
 						echo '<td><div style="text-align: right;"><button type="submit" class="btn btn-danger btn-sm disabled" name="submitDelUser" data-toggle="tooltip" data-placement="bottom" title="Excluir usuário!"> <span class="glyphicon glyphicon-remove"></span> </button>
 						<button type="submit" class="btn btn-default btn-sm" name="submitEditUser" data-toggle="tooltip" data-placement="bottom" title="Editar usuário!"> <span class="glyphicon glyphicon-pencil"></span> </button>
 						<a class="btn btn-info btn-sm" href="profile.php?user='.$row['idtbUser'].'" target="_blank" data-toggle="tooltip" data-placement="bottom" title="Visualizar perfil em uma nova página."> <span class="glyphicon glyphicon-zoom-in"></span> </a>
 						</form></div></td></tr>';
-						
-						
 					}
 					echo '</table>';
-					
-					
 						echo 'Inserir novo usuário<br>
 						<form action="usermanager.php" method="post" name="form1" class="form-inline" autocomplete="off">
 						<input maxlength="60" name="txt_nome" id="entravalor2" value="" size="50" class="form-control" required placeholder="Nome" autocomplete="off"/>

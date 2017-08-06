@@ -11,11 +11,12 @@
 <?php
 include "conecta.php";
 
-if (isset($_GET['submitRelationDel'])) {
+if (isset($_POST['submitRelationDel'])) {
 
-	$user = $_GET['sel_user'];
-	$objective = $_GET['sel_objective'];
-	$question = $_GET['txt_question'];
+	$user = $_POST['sel_user'];
+	$weight = $_POST['txt_value'];
+	$min = $_POST['txt_min'];
+	$max = $_POST['txt_max'];
 
 	if (($user != "") AND ($objective != "")) {
 	
@@ -31,20 +32,33 @@ if (isset($_GET['submitRelationDel'])) {
 	
 }
 
-$Sql0 = "SELECT * FROM tbuserquestion WHERE tbuserquestion.idtbUserQuestion >= 53 AND tbuserquestion.idtbUserQuestion <= 63 ";
-$rs0 = mysqli_query($conexao, $Sql0) or die ("Erro");
-while($linha0 = mysqli_fetch_array($rs0, MYSQLI_ASSOC)){
-	
-	$user = 2; //Engenheiro do Conhecimento + Autor: 1 . Autor: 2. Usuário: 3. Desenvolvedor: 4.
-	$objective = 1; //Entrega e Distribuição: 1; Acesso: 2; Capacidade de Resposta: 3; Dinâmica de Aprendizagem: 4;.
-	$weight = 1;
-	$question = $linha0['idtbUserQuestion'];
+if (isset($_POST['submitRelationAdd'])) {
 
-	if (($user != "") AND ($objective != "")) {
+	$user = $_POST['sel_user'];
+	$weight = $_POST['txt_value'];
+	$min = $_POST['txt_min'];
+	$max = $_POST['txt_max'];
+
+$Sql0 = "SELECT * FROM tbquestionid WHERE idtbQuestionId >= ".$min." AND idtbQuestionId <= ".$max;
+$rs0 = mysqli_query($conexao, $Sql0) or die ("Erro ao listar");
+while($linha0 = mysqli_fetch_array($rs0, MYSQLI_ASSOC)){
+/*
+1 - Engenheiro do conhecimento + Autor
+2 - Autor
+3 - Professor/Tutor
+4 - Desenvolvedor
+5 - Estudante
+6 - Gestor
+7 - Especialista
+*/	
+
+	$question = $linha0['idtbQuestionId'];
+
+	if ($user != "") {
 	
-		$Sql = "SELECT * FROM tbobjectives_has_tbuserquestion WHERE tbObjectives_idtbObjectives = ".$objective." AND tbUserQuestion_idtbUserQuestion = ".$question." AND tbUserType_idtbUserType = ".$user." ";
+		$Sql = "SELECT * FROM `tbusertype_has_tbuserquestion` WHERE tbQuestionId_idtbQuestionId = ".$question." AND tbUserType_idtbUserType = ".$user." ";
 		echo $Sql;
-		$rs = mysqli_query($conexao, $Sql) or die ("Erro");
+		$rs = mysqli_query($conexao, $Sql) or die ("Erro obter quantidade");
 		
 		$i = 0;
 		while($linha = mysqli_fetch_array($rs, MYSQLI_ASSOC)){
@@ -52,13 +66,15 @@ while($linha0 = mysqli_fetch_array($rs0, MYSQLI_ASSOC)){
 		}	
 	
 		if ($i == 0) {
-			$Sql = "INSERT INTO `tbobjectives_has_tbuserquestion` (`idtbObjectives_has_tbUserQuestion`, `tbObjectives_idtbObjectives`, `tbUserQuestion_idtbUserQuestion`, `tbUserType_idtbUserType`, `tbObjectives_has_tbUserWeight`) VALUES (NULL, '".$objective."', '".$question."', '".$user."', '".$weight."')";
+			$Sql = "INSERT INTO `tbusertype_has_tbuserquestion` (`tbUserType_idtbUserType`, `tbUserType_has_tbUserQuestionWeight`, `tbQuestionId_idtbQuestionId`) VALUES ('".$user."', '".$weight."', '".$question."')";
+			//$Sql = "INSERT INTO `tbobjectives_has_tbuserquestion` (`idtbObjectives_has_tbUserQuestion`, `tbObjectives_idtbObjectives`, `tbUserQuestion_idtbUserQuestion`, `tbUserType_idtbUserType`, `tbObjectives_has_tbUserWeight`) VALUES (NULL, '".$objective."', '".$question."', '".$user."', '".$weight."')";
 			$rs = mysqli_query($conexao, $Sql) or die ("Erro ao inserir");
 		}
 	
 		if ($i == 1) {
 			if (!is_numeric($weight)) $weight = 1.00;
-			$Sql = "UPDATE `tbobjectives_has_tbuserquestion` SET `tbObjectives_has_tbUserWeight` = '".$weight."' WHERE `tbobjectives_has_tbuserquestion`.`tbObjectives_idtbObjectives` = ".$objective." AND `tbobjectives_has_tbuserquestion`.`tbUserQuestion_idtbUserQuestion` = ".$question." AND `tbobjectives_has_tbuserquestion`.`tbUserType_idtbUserType` = ".$user.";";
+			$Sql = "UPDATE `tbusertype_has_tbuserquestion` SET `tbUserType_has_tbUserQuestionWeight` = '".$weight."' WHERE  `tbusertype_has_tbuserquestion`.`tbUserType_idtbUserType` = ".$user." AND `tbusertype_has_tbuserquestion`.`tbQuestionId_idtbQuestionId` = ".$question;
+			//$Sql = "UPDATE `tbobjectives_has_tbuserquestion` SET `tbObjectives_has_tbUserWeight` = '".$weight."' WHERE `tbobjectives_has_tbuserquestion`.`tbObjectives_idtbObjectives` = ".$objective." AND `tbobjectives_has_tbuserquestion`.`tbUserQuestion_idtbUserQuestion` = ".$question." AND `tbobjectives_has_tbuserquestion`.`tbUserType_idtbUserType` = ".$user.";";
 			$rs = mysqli_query($conexao, $Sql) or die ("Erro ao editar");
 		}
 		
@@ -73,9 +89,28 @@ while($linha0 = mysqli_fetch_array($rs0, MYSQLI_ASSOC)){
 }
 
 
-
+}
 
 ?>
+
+<form action="scriptrelacaoquestao.php" method="POST">
+	<input type="text" name="txt_min" value="" />
+	<input type="text" name="txt_max" value="" />
+	
+	<select name="sel_user">
+		<option value="1">Engenheiro do conhecimento</option>
+		<option value="2">Autor</option>	
+		<option value="3">Professor/Tutor</option>	
+		<option value="4">Desenvolvedor</option>	
+		<option value="5">Estudante</option>	
+		<option value="6">Gestor</option>	
+		<option value="7">Especialista</option>	
+	</select>
+	<input type="text" name="txt_value" value="1" />
+	<input type="submit" name="submitRelationAdd" value="adicionar" />
+	<input type="submit" name="submitRelationDel" value="excluir" />
+</form>
+
 
 </body>
 

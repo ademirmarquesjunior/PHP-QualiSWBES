@@ -54,17 +54,11 @@ include "conecta.php";
 
 //----------Insere as questões respondidas---------------------------------------------------------------------------------------------//
             foreach ($_POST as $key => $value) {
-            	if ($value != 6) {
                 if (is_numeric($key) AND is_numeric($value)) {
-						$Sql = "SELECT * FROM `tbquestion` WHERE `tbQuestionId_idtbQuestionId` = '".$key."'";
-						$rs = mysqli_query($conexao, $Sql) or die ("Erro listar "); 
-						while ($row = mysqli_fetch_assoc($rs)) {                 	
-                    $Sql2 = "INSERT INTO `tbform_has_tbuserquestion` (`tbForm_idtbForm`, `tbUserQuestion_idtbUserQuestion`, `tbForm_has_tbUserQuestionAnswer`) VALUES ('" . $_SESSION['form_id'] . "', '" . $row['idtbQuestion'] . "', '" . $value . "')";
-                    $rs2 = mysqli_query($conexao, $Sql2) or die ("Erro insere formulário");
+                    $Sql = "INSERT INTO `tbform_has_tbuserquestion` (`tbForm_idtbForm`, `tbUserQuestion_idtbUserQuestion`, `tbForm_has_tbUserQuestionAnswer`) VALUES ('" . $_SESSION['form_id'] . "', '" . $key . "', '" . $value . "')";
+                    $rs = mysqli_query($conexao, $Sql) or die("Erro insere formulário");
                     $inserted = 1;
-                 }
                 }
-             }
             }
 
 //----------Se questões foram inseridas na tabela de respostas incrementar o status----------------------------------------------------//
@@ -124,8 +118,9 @@ include "conecta.php";
                 echo "<script> location.reload(); </script>";
 					}
 				}
+             //echo $status;
 
-//----------Se o status atual é maior que  4 (número de artefatos) atualizar o formulário como completo ---------------------------------------------//
+//----------Se o status atual é maior que  4 (número de artefatos)-------------------------------------------------------------------//
             if ($status > 4) {
 					//Atualizar o formulário no banco de dados como completado	           	
 					$Sql = "UPDATE `tbform` SET `tbformCompleted` = '1' WHERE `tbform`.`idtbForm` = " . $_SESSION['form_id'] . " AND `tbform`.`tbApplication_idtbApplication` = " . $_SESSION['appic_id'] . " AND `tbform`.`tbUser_idtbUser` = " . $_SESSION['user_id'] . "";
@@ -142,7 +137,7 @@ include "conecta.php";
             ?>
 
 
-            <form action="form.php" class="form-group" id="form1" method="post">
+            <form action="form.php" class="form-group" method="post">
                 <div class="panel panel-default">
                     <div class="panel-heading">
                         <h2><img src="img/form.png" height="113" alt="">Questionário</h2>
@@ -158,12 +153,10 @@ include "conecta.php";
 //----------Listar as questões do formulário--------------------------------------------------------//                        
             $order = "ORDER BY tbuserquestion.tbArtifact_idtbArtifact";
             $artifact_change = 1;
-            $factor_change = '';
+            //$factor_change = '';
             $i = 0;
-				
-				$Sql = "SELECT DISTINCT idtbQuestionId, tbQuestionText, tbQuestionTextHowTo, tbquestiontext.tbLanguage_idtbLanguage, tbartifacttext.tbArtifact_idtbArtifact, tbartifacttext.tbArtifactName, tbartifacttext.tbArtifactDesc FROM tbquestionid INNER JOIN tbquestiontext ON tbquestionid.idtbQuestionId = tbquestiontext.tbQuestionId_idtbQuestionId INNER JOIN tbusertype_has_tbuserquestion ON tbquestionid.idtbQuestionId = tbusertype_has_tbuserquestion.tbQuestionId_idtbQuestionId INNER JOIN tbquestion ON tbquestionid.idtbQuestionId = tbquestion.tbQuestionId_idtbQuestionId INNER JOIN tbartifacttext ON tbquestion.tbArtifact_idtbArtifact = tbartifacttext.tbArtifact_idtbArtifact WHERE tbartifacttext.tbLanguage_idtbLanguage = " . $_SESSION['language'] . " AND tbquestiontext.tbLanguage_idtbLanguage = " . $_SESSION['language'] . " AND tbquestion.tbArtifact_idtbArtifact = " . (int)$status . " AND tbusertype_has_tbuserquestion.tbUserType_idtbUserType = ".$user_type;
-				
-            
+
+            $Sql = "SELECT DISTINCT idtbUserQuestion, tbuserquestion.tbArtifact_idtbArtifact, tbArtifactName, tbFactor_idtbFactor, tbQuestionText, tbQuestionTextHowTo FROM tbuserquestion INNER JOIN tbquestiontext ON tbuserquestion.idtbUserQuestion = tbquestiontext.tbUserQuestion_idtbUserQuestion INNER JOIN tbobjectives_has_tbuserquestion ON tbuserquestion.idtbUserQuestion = tbobjectives_has_tbuserquestion.tbUserQuestion_idtbUserQuestion INNER JOIN tbartifacttext ON tbuserquestion.tbartifact_idtbArtifact = tbartifacttext.tbArtifact_idtbArtifact WHERE tbuserquestion.tbartifact_idtbArtifact = " . (int)$status . " AND tbartifacttext.tbLanguage_idtbLanguage = 1 AND tbquestiontext.tbLanguage_idtbLanguage = " . $_SESSION['language'] . " AND tbobjectives_has_tbuserquestion.tbUserType_idtbUserType = " . $user_type . " " . $order;
             $rs = mysqli_query($conexao, $Sql) or die ("Erro na listagem de questões");
             if (mysqli_num_rows($rs) == 0) { //Se não há questões para o status atual pular para o próximo
                 $status++;
@@ -173,49 +166,55 @@ include "conecta.php";
             }
 
             while ($row = mysqli_fetch_array($rs, MYSQL_ASSOC)) {
-                $id = $row["idtbQuestionId"];
+                $id = $row["idtbUserQuestion"];
                 $artifact = $row["tbArtifact_idtbArtifact"];
                 $artifact_name = $row["tbArtifactName"];
-                $artifact_text = $row["tbArtifactDesc"];
+                $Factor = $row["tbFactor_idtbFactor"];
                 $question = $row["tbQuestionText"];
                 $howto = $row["tbQuestionTextHowTo"];
                 $i++;
                 
+                
                 if ($artifact_change) {
-                   echo '<div class="panel panel-primary" data-toggle="tooltip" data-placement="top" title="'.$artifact_text.'"><div class="panel-body">
+                   echo '<div class="panel panel-primary"><div class="panel-body">
                    <h2>'.$artifact_name.$item_name.'</h2></div></div>';
                    $artifact_change = 0;
                 }
+                
+
+              /*if ($factor_change != $Factor) {
+                  $Sql2 = "SELECT * FROM `tbfactor` INNER JOIN tbfactortext ON tbfactor.idtbFactor = tbfactortext.tbFactor_idtbFactor WHERE tbfactor.idtbFactor = '" . $Factor . "' AND tbLanguage_idtbLanguage = " . $_SESSION['language'];
+                  $rs2 = mysqli_query($conexao, $Sql2) or die("Erro na pesquisa");
+                  while ($row2 = mysqli_fetch_array($rs2, MYSQLI_ASSOC)) {
+                      echo "<hr><h6>" . $row2['tbFactorName'] . "</h6>";
+                      $factor_change = $Factor;
+                  }
+              }*/
                     
 					echo '<div class="panel panel-body">
 								<div class="panel-heading" >
-									<h4 id="question"> '.$i.' - '. $question .'</h4><a href="#" data-toggle="tooltip" data-placement="right" title="'.$howto.'">Como responder?</a> 
-									<input type="checkbox" id="check'.$i.'" name="check'.$i.'" value="Car" onclick="return disable('.$i.')"> Não se aplica								
+									<h4 id="question"> '.$i.' - '. $question .'</h4><a href="#" data-toggle="tooltip" data-placement="right" title="'.$howto.'">Como responder?</a>
 								</div>
-							<div class="panel-body" id="div'.$i.'">';
+							<div class="panel-body">';
                echo '<div class="row">';
 
-					echo '<div class="col-md-4" align="left" >';
-					
-					echo 'não atende   <input id="slider'.$i.'" name="'.$id.'" type="text" data-slider-ticks="[0, 1, 2, 3, 4, 5]" data-slider-ticks-snap-bounds="2" data-slider-ticks-labels="["0", "1", "2", "3", "4", "5"]"/>    atende
+					echo '<div class="col-md-4" align="right">';
+					echo '<input id="slider'.$i.'" name="'.$id.'" type="text" data-slider-ticks="[1, 2, 3, 4, 5]" data-slider-ticks-snap-bounds="2" data-slider-ticks-labels="["1", "2", "3", "4", "5"]"/>
                     <script>$("#slider'.$i.'").slider({
-										    ticks: [0, 1, 2, 3, 4, 5],
-										    ticks_labels: ["0","1", "2", "3", "4", "5"],
-										    value: 0,
-										    range: false,
+										    ticks: [1, 2, 3, 4, 5],
+										    ticks_labels: ["1", "2", "3", "4", "5"],
+										    value: 1,
 										    step: 1,
 										    ticks_snap_bounds: 2
 										});</script>';
-					
 					echo '</div>';
 					echo '</div>';
 					echo '</div>';
 					echo '</div>';                                  
                 
             }
-            
-            echo '<input class="btn btn-primary btn-block btn-lg" type="submit" value="'.$lang['FORM_BUTTON'].'" />';
             ?>
+                        <input class="btn btn-primary btn-block btn-lg" type="submit" value="Seguir" />
                     </div>
                 </div>
             </form>
@@ -228,28 +227,28 @@ include "conecta.php";
 if ((int)$status == 1){
 	echo '<script>
             window.onload = function () {
-                swal("'.$artifact_name.'", "'.$lang['FORM_ONTOLOGY_TEXT'].$item_name.'");
+                swal("Ontologias", "Você está avaliando o elemento `'.$item_name.'`");
             }</script>';
 }
 
 if ((int)$status == 2){
 	echo '<script>
             window.onload = function () {
-                swal("'.$artifact_name.'", "'.$lang['FORM_LEARNINGOBJECT_TEXT'].$item_name.'`");
+                swal("Objetos de Aprendizagem", "Você está avaliando o elemento `'.$item_name.'`");
             }</script>';
 }
 
 if ((int)$status == 3){
 	echo '<script>
             window.onload = function () {
-                swal("'.$artifact_name.'", "'.$lang['FORM_INTERFACE_TEXT'].'");
+                swal("Interface", "Neste aviso estará um pequeno texto explicando sobre o que será avaliado em geral, destacando que os objetos avaliados dependem do tipo de avaliador que está usando o sistema de avaliação.");
             }</script>';
 }
 
 if ((int)$status == 4){
 	echo '<script>
             window.onload = function () {
-                swal("'.$artifact_name.'", "'.$lang['FORM_SOFTWARE_TEXT'].'");
+                swal("Software", "Neste aviso estará um pequeno texto explicando sobre o que será avaliado em geral, destacando que os objetos avaliados dependem do tipo de avaliador que está usando o sistema de avaliação.");
             }</script>';
 }
 
@@ -263,16 +262,6 @@ if ((int)$status == 4){
             $(function(){
     				$('[data-toggle=tooltip]').tooltip();
  				});
- 				
-				function disable(id) {
-						
-						$("#div"+id).empty();
-						$("#check"+id).prop("disabled", true);
-						//alert(id);
-						
-						//$("#slider"+id).slider("toggle");
-				
-				} 				
         </script>
     </body>
 </html>

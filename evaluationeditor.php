@@ -3,6 +3,7 @@ session_start();
 include "valida.php";
 include "language.php";
 include "conecta.php";
+include "class-lib.php";
 ?>
 <!DOCTYPE html>
 <html>
@@ -11,13 +12,10 @@ include "conecta.php";
         <meta content="text/html; charset=utf-8" http-equiv="content-type" />
         <link href="css/bootstrap.min.css" rel="stylesheet">
         <link href="css/style.css" rel="stylesheet">
-        <link rel="stylesheet" type="text/css" href="slider/rzslider.css"/>
         <link rel="stylesheet" href="css/sweetalert.css">
         <script src="js/jquery-3.1.1.min.js"></script>        
         <script src="js/bootstrap.min.js"></script>
         <script src="js/sweetalert.js"></script>
-<!-- 			<script src="slider/angular.min.js"></script>
-        <script src="slider/rzslider.min.js"></script> -->
         <link rel="icon" type="image/png" href="favicon.png">
         <title>Avalia SEWebS</title>
     </head>
@@ -105,20 +103,24 @@ include "conecta.php";
                 if (isset($_POST['applic_id'])) $applic_id = anti_injection($_POST['applic_id']);
 
                 $Sql = "SELECT * FROM tbapplication WHERE idtbApplication = " . $applic_id . " AND tbUser_idtbUser = '" . $user . "'";
+					if ($_SESSION['user_level'] >=3) {
+						$Sql = "SELECT * FROM tbapplication WHERE idtbApplication = " . $applic_id;
+					}                
+                
                 $rs = mysqli_query($conexao, $Sql);
                 if (mysqli_num_rows($rs) == 0) {
                     echo "<script> window.location.assign('index3.php')</script>";
                 } else {
                     $row = mysqli_fetch_assoc($rs);
                     $applic_name = $row['tbApplicationName'];
-                    $applic_text = $row['tbApplicationDescription'];
                     echo '<div class="panel panel-default">';
                     echo '<div class="panel-heading">';
                     echo '<div class="panel panel-default">
                				<div class="panel-body">';
 							echo "<h1><img src='img/result.png' height='113' alt=''><strong>".$applic_name."</strong></h1>";
+							echo '<a class="btn btn-info btn-md " href="results.php?applic='.$applic_id.'" target="_blank" data-toggle="tooltip" data-placement="bottom" title="Visialize o relátório em uma nova página."> <span class="glyphicon glyphicon-zoom-in"></span> Abrir Relatório</a>';
 							echo "</div></div>";
-                    echo '<p>' . $applic_text . '</p></div></div>';
+                    echo '<p></p></div></div>';
                 }
             } else {
 					echo "<script> window.location.assign('index3.php')</script>";            
@@ -133,12 +135,10 @@ include "conecta.php";
 					
 					if ($user_id == '' OR $user_id == '') echo "<script> window.history.back()</script>";					
 					//echo "inclui usuario";
-					
-					//$Sql = "INSERT INTO `tbapplication_has_tbuser` (`tbApplication_idtbApplication`, `tbUser_idtbUser`, `tbUserType_idtbUserType`) VALUES ('".$applic_id."', '".$user_id."', '".$user_type."')";
+
 					$Sql = "INSERT INTO `tbform` (`idtbForm`, `tbApplication_idtbApplication`, `tbUser_idtbUser`, `tbFormCompleted`, `tbFormStatus`, `tbUserType_idtbUserType`, `tbFormDate`) VALUES (NULL, '".$applic_id."', '".$user_id."', '0', '0', '".$user_type."', NULL)";
 					//echo $Sql;
 					$rs = mysqli_query($conexao, $Sql) or die ("Erro na inserção");					
-					
 				}
 				
 //----------Exluir usuário da lista de formulários
@@ -222,20 +222,10 @@ include "conecta.php";
                	$user = $row['tbUserName'];
                	
                }
-               $to = $email;
-					$subject = "[AvaliaQASWebE] Usuário cadastrado";
-					$txt = "<html><head><title>HTML email</title></head>
-						<body>
-						<h3>Olá ".$user."</h3>
-						<p>Você foi indicado para avaliar um sistema educacional utilizando o sistema de avaliação de sistemas educacionais baseados em Web Semântica AvaliaQASWebE disponível  <a href='http://avaliasewebs.caed-lab.com/index.php' target='_blank'>aqui</a>.</p>
-						<p>Acesse a área principal para acessar o formulário de avaliação.</p>
-						</body>
-						</html>";
-					$headers = "MIME-Version: 1.0" . "\r\n";
-					$headers .= "Content-type:text/html;charset=UTF-8" . "\r\n";
-					$headers .= 'From: <no-reply@caed-lab.com>' . "\r\n";
-					
-					mail($to,$subject,$txt,$headers);
+               
+               $emailObject = new Email();
+               $emailObject->notifyUser($email,$user,NULL);
+               		
                 echo "<script language='javascript' type='text/javascript'>
 								swal({   title: '',   text: 'Email enviado com sucesso',    type: 'success'  });
 							</script>";
@@ -244,20 +234,17 @@ include "conecta.php";
 				           
 //----------Hub de opções para exibição do resumo de avaliações
             echo "<div class='panel panel-default'>
-							<div class='panel-heading'><h1>Visualize resumo de avaliação</h1></div>
 							<div class='panel-body'>";
-				echo '<a class="btn btn-info btn-md " href="results.php?applic='.$applic_id.'" target="_blank" data-toggle="tooltip" data-placement="bottom" title="Visialize o relátório em uma nova página."> <span class="glyphicon glyphicon-zoom-in"></span> Abrir </a>';
-				
-											
 							            
-            echo "</div></div>";
+            //echo "</div></div>";
             
             
 //----------Formulário para inclusão de usuários
-            echo "<div class='panel panel-default'>
-							<div class='panel-heading'><h1>Gerencie avaliadores</h1></div>
-							<div class='panel-body'>";
-            //echo "<p>Excluir usuários também exclui avaliações já terminadas por esse usuário!</p>";
+            //echo "<div class='panel panel-default'>
+				//			<div class='panel-heading'><h1>Gerencie avaliadores</h1></div>
+				//			<div class='panel-body'>";
+				
+				echo "<h2>Avaliadores</h2>";
 
             $Sql = "SELECT * FROM `tbform` INNER JOIN tbuser ON tbform.tbUser_idtbUser = tbuser.idtbUser INNER JOIN tbusertypetext ON tbform.tbUserType_idtbUserType = tbusertypetext.tbUserType_idtbUserType WHERE tbusertypetext.tbLanguage_idtbLanguage = 1 AND tbform.tbApplication_idtbApplication =" . $applic_id;
             $rs = mysqli_query($conexao, $Sql);
@@ -273,21 +260,21 @@ include "conecta.php";
 							echo '</td><td>
 							<input name="applic_id" value="'.$applic_id.'" size="12" type="text" hidden/>
 							<input name="form_id" value="'.$row['idtbForm'].'" size="12" type="text" hidden/>
-							<div style="text-align: right;"><button type="submit" class="btn btn-danger btn-sm" name="submitDelUser" data-toggle="tooltip" data-placement="bottom" title="Excluir avaliador para a avaliação. Exclui avaliação já terminada!"> <span class="glyphicon glyphicon-remove"></span> </button>
+							<div style="text-align: right;"><button type="submit" class="btn btn-danger btn-sm" name="submitDelUser" data-toggle="tooltip" data-placement="bottom" title="Excluir avaliador para a avaliação. Exclui avaliação já terminada!"> <span class="glyphicon glyphicon-remove"></span> Excluir</button>
 							<button type="submit" class="btn btn-default btn-sm ';
 							if ($row['tbFormCompleted'] == '1') { echo ' disabled'; }
-							echo '" name="submitNotifyUser" data-toggle="tooltip" data-placement="bottom" title="Notifique o usuário de avaliações pendentes!"> <span class="glyphicon glyphicon-info-sign"></span></button>
-							<button type="submit" class="btn btn-warning btn-sm" name="submitDelForm" data-toggle="tooltip" data-placement="bottom" title="Reinicie todas as questões respondidas pelo usuário!"> <span class="glyphicon glyphicon-refresh"></span></button> 
+							echo '" name="submitNotifyUser" data-toggle="tooltip" data-placement="bottom" title="Notifique o usuário de avaliações pendentes!"> <span class="glyphicon glyphicon-info-sign"></span> Notificar</button>
+							<button type="submit" class="btn btn-warning btn-sm" name="submitDelForm" data-toggle="tooltip" data-placement="bottom" title="Reinicie todas as questões respondidas pelo usuário!"> <span class="glyphicon glyphicon-refresh"></span> Reiniciar</button> 
 							<a class="btn btn-info btn-sm';
 							if ($row['tbFormCompleted'] == '0') { echo ' disabled'; }
-							echo '" href="results.php?form='.$row['idtbForm'].'" target="_blank" data-toggle="tooltip" data-placement="bottom" title="Visialize o resumo do formulário já terminado em uma nova página."> <span class="glyphicon glyphicon-zoom-in"></span> </a>';							
+							echo '" href="results.php?form='.$row['idtbForm'].'" target="_blank" data-toggle="tooltip" data-placement="bottom" title="Visialize o resumo do formulário já terminado em uma nova página."> <span class="glyphicon glyphicon-zoom-in"></span> Abrir </a>';							
 							echo '</div></td></tr></form>';
                 }
                 echo '</table>';
             }
 
 				//echo '<br><h3>Inclua usuários:</h3>';
-            echo '<hr><form method="post" action="evaluationeditor.php" class="form form-inline">';
+            echo '<form method="post" action="evaluationeditor.php" class="form form-inline">';
             echo '<input name="applic_id" value="'.$applic_id.'" size="12" type="text" hidden/>';
             
             echo '<select name="sel_user" id="user" class="form-control">';
@@ -313,12 +300,10 @@ include "conecta.php";
             echo '<button type="submit" name="submitAddUser" class="btn btn-primary"><span class="glyphicon glyphicon-plus-sign"></span> Adicionar</button></form>';
             echo "O usuário que você procura ainda não foi cadastrado? <a href=''>Cadastre um novo usuário</a>";
             
-            echo "</div></div>";
             
-//----------Formulário para inclusão de objetos de aprendizagem
-				echo "<div class='panel panel-default'>
-							<div class='panel-heading' data-toggle='tooltip' data-placement='bottom' title='O que é um Objeto de Aprendizagem?'><h1>Objetos de Aprendizagem</h1></div>
-							<div class='panel-body'>";
+
+							
+				echo "<br><br><br><br><hr><h2>Objetos de Aprendizagem</h2>";			
             
             $Sql = "SELECT * FROM `tblearningobjects` WHERE tbApplication_idtbApplication = " . $applic_id;
             $rs = mysqli_query($conexao, $Sql);
@@ -332,26 +317,26 @@ include "conecta.php";
                     <input name="LearningObject_id" value="'.$row['idLearningObjects'].'" size="12" type="text" hidden/>
                     <tr><td>
                     <strong>'.$row['tbLearningObjectsName'].'</strong></td>
-                    <td><div style="text-align: right;"><button type="submit" class="btn btn-danger btn-sm" name="submitDelLearningObject" data-toggle="tooltip" data-placement="bottom" title="Excluir Objetos de Aprendizagem exclui avaliações já terminadas anteriormente!"> <span class="glyphicon glyphicon-remove"></span> </button></div></td></tr>
+                    <td><div style="text-align: right;"><button type="submit" class="btn btn-danger btn-sm" name="submitDelLearningObject" data-toggle="tooltip" data-placement="bottom" title="Excluir Objetos de Aprendizagem exclui avaliações já terminadas anteriormente!"> <span class="glyphicon glyphicon-remove"></span> Excluir </button></div></td></tr>
                     </form>';
                 }
                 echo '</table>';
             }
-            
-           
-            echo '<br><p>Inclua um objeto de aprendizagem:<br>';
+
             echo '<form method="post" action="evaluationeditor.php" name="formLearningObject" class="form form-inline">';
             echo '<input name="applic_id" value="'.$applic_id.'" size="12" type="text" hidden/>';
-            echo '<input name="learningobject_text" value="" size="35" type="text" class="form-control" required/>';
+            echo '<input name="learningobject_text" value="" size="35" type="text" placeholder="Insira um Objeto de Aprendizagem" class="form-control" required/>';
             
-            echo '<button type="submit" name="submitLearningObject" class="btn btn-primary"><span class="glyphicon glyphicon-plus-sign"></span> Adicionar</button></form></p>';
+            echo '<button type="submit" name="submitLearningObject" class="btn btn-primary"><span class="glyphicon glyphicon-plus-sign"></span> Adicionar</button></form>';
             
-            echo "</div></div>";
+            //echo "</div></div>";
             
 //----------Formulário para inclusão de ontologias           
-            echo "<div class='panel panel-default'>
-							<div class='panel-heading' data-toggle='tooltip' data-placement='bottom' title='O que é uma ontologia?'><h1>Ontologias</h1></div>
-							<div class='panel-body'>";
+            //echo "<div class='panel panel-default'>
+				//			<div class='panel-heading' data-toggle='tooltip' data-placement='bottom' title='O que é uma ontologia?'><h1>Ontologias</h1></div>
+				//			<div class='panel-body'>";
+							
+				echo "<br><br><br><br><hr><h2>Ontologias</h2>";	
             
             $Sql = "SELECT * FROM `tbontologies` WHERE tbApplication_idtbApplication = " . $applic_id;
             $rs = mysqli_query($conexao, $Sql);
@@ -365,20 +350,28 @@ include "conecta.php";
                     <input name="ontology_id" value="'.$row['idOntologies'].'" size="12" type="text" hidden/>
                     <tr><td>
 				        <strong>'.$row['tbOntologiesName'].'</strong></td>
-                    <td><div style="text-align: right;"><button type="submit" class="btn btn-danger btn-sm" name="submitDelOntology" data-toggle="tooltip" data-placement="bottom" title="Excluir Ontologias exclui avaliações já terminadas anteriormente!"> <span class="glyphicon glyphicon-remove"></span> </button></form></div></td></tr>';
+                    <td><div style="text-align: right;"><button type="submit" class="btn btn-danger btn-sm" name="submitDelOntology" data-toggle="tooltip" data-placement="bottom" title="Excluir Ontologias exclui avaliações já terminadas anteriormente!"> <span class="glyphicon glyphicon-remove"></span> Excluir</button></form></div></td></tr>';
                 }
                 echo '</table>';
             }
-            
-            
-            echo '<br><p>Inclua uma ontologia:<br>';
+
             echo '<form method="post" action="evaluationeditor.php" name="formOntology" class="form form-inline">';
             echo '<input name="applic_id" value="'.$applic_id.'" size="12" type="text" hidden/>';
-            echo '<input name="ontology_text" value="" size="35" type="text" class="form-control" required/>';
-            echo '<button type="submit" name="submitOntology" class="btn btn-primary"><span class="glyphicon glyphicon-plus-sign"></span> Adicionar</button></form></p>';
+            echo '<input name="ontology_text" value="" size="35" type="text" placeholder="Insira uma Ontologia" class="form-control" required/>';
+            echo '<button type="submit" name="submitOntology" class="btn btn-primary"><span class="glyphicon glyphicon-plus-sign"></span> Adicionar</button></form>';
             
             echo "</div></div>";
             
+            /*
+            $crud = new Crud();
+            $crud->conn();
+            $result = $crud->selectCustomQuery("select * tbuser");
+            while ($row = $result->fetch_assoc()){
+            	print_r($row);
+            }
+            
+            $crud->close();
+            */
             ?>
             <hr>
 

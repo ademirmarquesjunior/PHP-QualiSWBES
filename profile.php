@@ -11,13 +11,10 @@ include "conecta.php";
         <meta content="text/html; charset=utf-8" http-equiv="content-type" />
         <link href="css/bootstrap.min.css" rel="stylesheet">
         <link href="css/style.css" rel="stylesheet">
-        <link rel="stylesheet" type="text/css" href="slider/rzslider.css"/>
         <link rel="stylesheet" href="css/sweetalert.css">
         <script src="js/jquery-3.1.1.min.js"></script>        
         <script src="js/bootstrap.min.js"></script>
         <script src="js/sweetalert.js"></script>
-<!-- 			<script src="slider/angular.min.js"></script>
-        <script src="slider/rzslider.min.js"></script> -->
         <link rel="icon" type="image/png" href="favicon.png">
         <title>Avalia SEWebS</title>
     </head>
@@ -53,7 +50,7 @@ include "conecta.php";
             $user = $_SESSION['user_id'];
             $level = $_SESSION['user_level'];
 
-//----------Salva o perfil do usuário------------------------------------------------------------------------------------------------//
+//----------Abrir perfil de usuário (por gerente ou administrador)-------------------------------------------------------------------//
             if (isset($_GET['user'])) {
             	if ($_SESSION['user_level'] >=2) {	
 				   	$user_id = anti_injection($_GET['user']);
@@ -63,7 +60,7 @@ include "conecta.php";
 						
 						if(mysqli_num_rows($rs)>0) {
 							$row = mysqli_fetch_assoc($rs);				
-						
+						echo "s";
 		         
 				            echo "<div class='panel panel-default'>
 											<div class='panel-heading'><h4>Você está visualizando o perfil de:</h4>
@@ -156,7 +153,7 @@ include "conecta.php";
 						echo '<p><button type="submit" name="submitNewProfile" class="btn btn-primary" onclick="window.close()">Fechar</button></p>';
 					}					   
 				}
-//----------Salva o perfil do usuário------------------------------------------------------------------------------------------------//
+//----------Salvar o perfil do usuário------------------------------------------------------------------------------------------------//
             elseif (isset($_POST['submitNewProfile'])) {
 					   $gender = anti_injection($_POST['sel_gender']);
 					   $age = anti_injection($_POST['sel_age']);         	
@@ -169,11 +166,10 @@ include "conecta.php";
 						$Sql = "SELECT * FROM `tbuserprofile` WHERE `tbUser_idtbUser` = ".$_SESSION['user_id'];
 						$rs = mysqli_query($conexao, $Sql);
 						
-						echo $gender;
 						
 						if(mysqli_num_rows($rs)) {
 							$Sql = "UPDATE `tbuserprofile` SET `tbUserProfileAge` = '".$age."', `tbUserProfileEducation` = '".$educ."', `tbUserProfileGender` = '".$gender."', `tbUserProfileOccupation` = '".$occupation."', `tbUserProfileInstitution` = '".$institution."', `tbUserProfileCountry` = '".$country."' WHERE `tbuserprofile`.`tbUser_idtbUser` = ".$_SESSION['user_id'];
-							echo $Sql;
+							//echo $Sql;
 							$rs = mysqli_query($conexao, $Sql);							
 							
 						} else {
@@ -181,15 +177,35 @@ include "conecta.php";
 							$rs = mysqli_query($conexao, $Sql);
 						}
 						
-						if ($manager == 2)	{
-							echo 'gerente?<br>';
+						if ($manager == 1)	{
+							$Sql = "UPDATE `tbuser` SET `tbUserManagerRequest` = '1' WHERE `tbuser`.`idtbUser` = ".$_SESSION['user_id'];;
+							//echo $Sql;
+							$rs = mysqli_query($conexao, $Sql);
+							//mostrar mensagem ou comunicar o administrador						
+						}						
 						
+						
+						if ($manager == 2)	{
+							$Sql = "UPDATE `tbuser` SET `tbUserManagerRequest` = '1' WHERE `tbuser`.`idtbUser` = ".$_SESSION['user_id'];;
+							//echo $Sql;
+							$rs = mysqli_query($conexao, $Sql);
+							//mostrar mensagem ou comunicar o administrador						
 						}				
 						
-            	
-            } else { 
+						echo "<script> swal({title: 'Perfil',
+								  text: 'Perfil salvo com sucesso!',
+								  type: 'success',
+								  showCancelButton: false,
+								  confirmButtonClass: 'btn-success',
+								  confirmButtonText: 'OK',
+								  closeOnConfirm: true}, function() { window.location.assign('index3.php')});</script>";
+						exit();
+            } 
+
+//----------Abrir formulário do perfil-----------------------------------------------------------------------------------------//            
+            else { 
             
-//----------Formulário para inclusão de ontologias  
+
 
 				$user = $_SESSION['user_login'];
 				$user_id = $_SESSION['user_id']; 
@@ -201,7 +217,6 @@ include "conecta.php";
 				if(mysqli_num_rows($rs)>0) {
 					$row = mysqli_fetch_assoc($rs);
 				}
-					//echo $row['tbUserProfileOccupation'];
 				
 				
          
@@ -219,6 +234,9 @@ include "conecta.php";
             	
             		<label>1. Escolha o genero:
             			<select name="sel_gender" class="form-control">
+            				<option value="" disabled ';
+            				if($row['tbUserProfileGender'] == '') { echo 'selected'; }
+            				echo '>Selecione</option> 
 								<option value="1" ';
 								if($row['tbUserProfileGender'] == 1) { echo 'selected'; }
 								
@@ -236,6 +254,9 @@ include "conecta.php";
             		
 						<label>2. Informe a sua faixa etária: 
 							<select name="sel_age" class="form-control">
+								<option value="" disabled ';
+            				if($row['tbUserProfileAge'] == '') { echo 'selected'; }
+            				echo '>Faixa etária</option>
 								<option value="1" ';
 								if($row['tbUserProfileAge'] == 1) { echo 'selected'; }
 								
@@ -269,6 +290,9 @@ include "conecta.php";
 						
 						<label>3. O seu nível de escolaridade:
 							<select name="sel_education" class="form-control">
+								<option value="" disabled ';
+            				if($row['tbUserProfileEducation'] == '') { echo 'selected'; }
+            				echo '>Formação</option>
 								<option value="1" ';
 								if($row['tbUserProfileEducation'] == 1) { echo 'selected'; }
 								

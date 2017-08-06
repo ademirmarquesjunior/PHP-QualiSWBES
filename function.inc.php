@@ -1,7 +1,7 @@
 <?php                       
 
 
-function extraiResultados ($value, $objective, $set) {
+function extraiResultados ($value, $set) {
 	include "conecta.php";
 	$total = 0;
 	$total_weight = 0;
@@ -10,18 +10,18 @@ function extraiResultados ($value, $objective, $set) {
     $sym_weight = array(array(array()));
 
     if ($value != '') {
-			    	
 		if ($set == 1) { //lista por aplicação
-			$Sql = "SELECT * FROM tbuserquestion INNER JOIN tbobjectives_has_tbuserquestion on tbuserquestion.idtbUserQuestion = tbobjectives_has_tbuserquestion.tbUserQuestion_idtbUserQuestion INNER JOIN tbform_has_tbuserquestion ON tbuserquestion.idtbUserQuestion = tbform_has_tbuserquestion.tbUserQuestion_idtbUserQuestion INNER JOIN tbform ON tbform_has_tbuserquestion.tbform_idtbform = tbform.idtbform  WHERE tbform.tbapplication_idtbapplication = ".$value." AND tbobjectives_has_tbuserquestion.tbObjectives_idtbObjectives = ".$objective;
+			$Sql = "SELECT distinct idtbform_has_tbuserquestion, tbForm_has_tbUserQuestionAnswer, tbUserType_has_tbUserQuestionWeight, tbArtifact_idtbArtifact, tbFactor_idtbFactor, tbSubFactor_idtbSubFactor FROM `tbform_has_tbuserquestion` INNER JOIN tbform ON  `tbForm_idtbForm` = tbform.idtbform inner join tbquestion ON tbuserquestion_idtbuserquestion = tbquestion.idtbquestion inner join tbquestionid on tbquestion.tbquestionid_idtbquestionid = tbquestionid.idtbquestionid inner join tbusertype_has_tbuserquestion on tbquestionid.idtbQuestionId = tbusertype_has_tbuserquestion.tbQuestionId_idtbQuestionId WHERE tbform.tbapplication_idtbapplication = ".$value;
 		} elseif($set == 2) { //lista por formulário
-			$Sql = "SELECT * FROM tbuserquestion INNER JOIN tbobjectives_has_tbuserquestion on tbuserquestion.idtbUserQuestion = tbobjectives_has_tbuserquestion.tbUserQuestion_idtbUserQuestion INNER JOIN tbform_has_tbuserquestion ON tbuserquestion.idtbUserQuestion = tbform_has_tbuserquestion.tbUserQuestion_idtbUserQuestion WHERE tbform_has_tbuserquestion.tbForm_idtbForm = ".$value." AND tbobjectives_has_tbuserquestion.tbObjectives_idtbObjectives = ".$objective;
+			$Sql = "SELECT distinct tbuserquestion_idtbuserquestion, tbForm_has_tbUserQuestionAnswer, tbUserType_has_tbUserQuestionWeight, tbArtifact_idtbArtifact, tbFactor_idtbFactor, tbSubFactor_idtbSubFactor FROM `tbform_has_tbuserquestion` inner join tbquestion ON tbuserquestion_idtbuserquestion = tbquestion.idtbquestion inner join tbquestionid on tbquestion.tbquestionid_idtbquestionid = tbquestionid.idtbquestionid inner join tbform on tbform_has_tbuserquestion.tbform_idtbform = tbform.idtbform inner join tbusertype_has_tbuserquestion on tbform.tbUserType_idtbUserType =  tbusertype_has_tbuserquestion.tbUserType_idtbUserType WHERE `tbForm_idtbForm` = ".$value;
 		}	
-		    	
         $rs = mysqli_query($conexao, $Sql) or die("Formulário não existe");
+        
+        
 
         while ($linha = mysqli_fetch_array($rs, MYSQLI_ASSOC)) {
-            $total = $total + $linha["tbForm_has_tbUserQuestionAnswer"]*$linha["tbObjectives_has_tbUserWeight"];
-            $total_weight = $total_weight + $linha["tbObjectives_has_tbUserWeight"];
+            $total = $total + $linha["tbForm_has_tbUserQuestionAnswer"]*$linha["tbUserType_has_tbUserQuestionWeight"];
+            $total_weight = $total_weight + $linha["tbUserType_has_tbUserQuestionWeight"];
             $counter++;
             
             if (!isset($sum[$linha["tbArtifact_idtbArtifact"]][$linha["tbFactor_idtbFactor"]][$linha["tbSubFactor_idtbSubFactor"]])){
@@ -29,8 +29,8 @@ function extraiResultados ($value, $objective, $set) {
             	$sum_weight[$linha["tbArtifact_idtbArtifact"]][$linha["tbFactor_idtbFactor"]][$linha["tbSubFactor_idtbSubFactor"]] = NULL;
             }
             
-            $sum[$linha["tbArtifact_idtbArtifact"]][$linha["tbFactor_idtbFactor"]][$linha["tbSubFactor_idtbSubFactor"]] = $sum[$linha["tbArtifact_idtbArtifact"]][$linha["tbFactor_idtbFactor"]][$linha["tbSubFactor_idtbSubFactor"]] + $linha["tbForm_has_tbUserQuestionAnswer"]*$linha["tbObjectives_has_tbUserWeight"];
-            $sum_weight[$linha["tbArtifact_idtbArtifact"]][$linha["tbFactor_idtbFactor"]][$linha["tbSubFactor_idtbSubFactor"]] = $sum_weight[$linha["tbArtifact_idtbArtifact"]][$linha["tbFactor_idtbFactor"]][$linha["tbSubFactor_idtbSubFactor"]] + $linha["tbObjectives_has_tbUserWeight"];
+            $sum[$linha["tbArtifact_idtbArtifact"]][$linha["tbFactor_idtbFactor"]][$linha["tbSubFactor_idtbSubFactor"]] = $sum[$linha["tbArtifact_idtbArtifact"]][$linha["tbFactor_idtbFactor"]][$linha["tbSubFactor_idtbSubFactor"]] + $linha["tbForm_has_tbUserQuestionAnswer"]*$linha["tbUserType_has_tbUserQuestionWeight"];
+            $sum_weight[$linha["tbArtifact_idtbArtifact"]][$linha["tbFactor_idtbFactor"]][$linha["tbSubFactor_idtbSubFactor"]] = $sum_weight[$linha["tbArtifact_idtbArtifact"]][$linha["tbFactor_idtbFactor"]][$linha["tbSubFactor_idtbSubFactor"]] + $linha["tbUserType_has_tbUserQuestionWeight"];
         }
      }
         
@@ -101,7 +101,7 @@ function detalhaResultados ($resultados) {
     	$rs = mysqli_query($conexao, $Sql);
        	while ($linha = mysqli_fetch_array($rs, MYSQLI_ASSOC)) {
         		//echo "<strong>".$rr['tbArtifactDescription']."</strong> ";
-        		$artifact = $linha['tbArtifactDesc'];
+        		$artifact = $linha['tbArtifactName'];
         } 
 		if ($artifact_weight != 0) {
 			$result = $artifact_sum/$artifact_weight*20;
@@ -115,35 +115,68 @@ function detalhaResultados ($resultados) {
 
 }
 
-function graficoBarra ($names, $values, $id) {	
-	echo '<canvas id="GraficoArtefato' . $id . '" style="width:85%;"></canvas>';
-   echo '<script type="text/javascript">
-			var options' . $id . ' = { responsive:true, scaleOverride:true, scaleSteps:10, scaleStartValue:0, scaleStepWidth:10, display:true };
-	var data' . $id . ' = {
-				labels: [';
-   foreach ($names as $name) {
-      echo '"' . $name . '",';
-   }
-   echo '],
-   datasets: [
-         {
-            label: "Dados primários",
-            fillColor: "rgba(51, 100, 153, 0.4)",
-            strokeColor: "rgba(51, 100, 153, 1)",
-            highlightFill: "rgba(51, 100, 153, 1)",
-            highlightStroke: "rgba(220,220,220,1)",
-            data: [';
-   foreach ($values as $value) {
-      //echo json_encode($value) . ',';
-      printf("%0.2f,",$value);
-   }
-   echo ']
-         }
-   ]
-};</script>';
-//$loadgraph = $loadgraph . 'var ctx' . $id . ' = document.getElementById("GraficoArtefato' . $id . '").getContext("2d"); var BarChart' . $id . ' = new Chart(ctx' . $id . ').Bar(data' . $id . ', options' . $id . ');';
-
+function graficoBarraHorizontal ($names, $values, $id) {
+	echo "
+<canvas id='myChart".$id."' ></canvas>
+<script>
+var ctx".$id." = document.getElementById('myChart".$id."');
+var myChart".$id." = new Chart(ctx".$id.", {
+    type: 'horizontalBar',
+    data: {
+        labels: [";
+        foreach ($names as $name) {
+      	echo "'" . $name . "',";
+   		}
+        echo "],
+        datasets: [{
+            label: '',
+            data: [";
+            foreach ($values as $value) {
+			      //echo json_encode($value) . ',';
+			      printf("%0.2f,",$value);
+			   }
+            echo "],
+            backgroundColor: [
+                'rgba(255, 99, 132, 0.5)',
+                'rgba(54, 162, 235, 0.5)',
+                'rgba(255, 206, 86, 0.5)',
+                'rgba(75, 192, 192, 0.5)',
+                'rgba(153, 102, 255, 0.5)',
+                'rgba(255, 159, 64, 0.5)'
+            ],
+            borderColor: [
+                'rgba(255,99,132,1)',
+                'rgba(54, 162, 235, 1)',
+                'rgba(255, 206, 86, 1)',
+                'rgba(75, 192, 192, 1)',
+                'rgba(153, 102, 255, 1)',
+                'rgba(255, 159, 64, 1)'
+            ],
+            borderWidth: 1
+        }]
+    },
+    options: { 
+    	legend: {
+			display: false,
+					labels: {
+						display: false
+					}    	
+    	},
+        scales: {
+            xAxes: [{
+                ticks: {
+                    beginAtZero:true,
+                    max: 100,
+                    min: 0
+                }
+            }]
+        }
+    }
+});
+</script>
+	";	
 }
+
 
 function graficoBarra2 ($names, $values, $id) {
 	echo "
@@ -167,12 +200,12 @@ var myChart".$id." = new Chart(ctx".$id.", {
 			   }
             echo "],
             backgroundColor: [
-                'rgba(255, 99, 132, 0.2)',
-                'rgba(54, 162, 235, 0.2)',
-                'rgba(255, 206, 86, 0.2)',
-                'rgba(75, 192, 192, 0.2)',
-                'rgba(153, 102, 255, 0.2)',
-                'rgba(255, 159, 64, 0.2)'
+                'rgba(255, 99, 132, 0.5)',
+                'rgba(54, 162, 235, 0.5)',
+                'rgba(255, 206, 86, 0.5)',
+                'rgba(75, 192, 192, 0.5)',
+                'rgba(153, 102, 255, 0.5)',
+                'rgba(255, 159, 64, 0.5)'
             ],
             borderColor: [
                 'rgba(255,99,132,1)',
@@ -185,7 +218,7 @@ var myChart".$id." = new Chart(ctx".$id.", {
             borderWidth: 1
         }]
     },
-    options: {
+    options: { 
     	legend: {
 			display: false,
 					labels: {
@@ -209,7 +242,7 @@ var myChart".$id." = new Chart(ctx".$id.", {
 
 
 function graficoRadar ($names, $values, $id) {
-	echo '<canvas id="myRadarChart'.$id.'" style="width:90%;"></canvas>
+	echo '<canvas id="myRadarChart'.$id.'" style="height:90%;"></canvas>
 	      <script type="text/javascript">
 	      var ctx'.$id.' = document.getElementById("myRadarChart'.$id.'");
 	      var myRadarChart'.$id.' = new Chart(ctx'.$id.', {
@@ -277,12 +310,18 @@ function graficoPolar ($names, $values, $id) {
 	               {
 	                  label: "Dados primários",
 	                  backgroundColor: [
-                "rgba(255, 99, 132, 0.2)",
-                "rgba(54, 162, 235, 0.2)",
-                "rgba(255, 206, 86, 0.2)",
-                "rgba(75, 192, 192, 0.2)",
-                "rgba(153, 102, 255, 0.2)",
-                "rgba(255, 159, 64, 0.2)"
+                "rgba(255, 99, 132, 0.5)",
+                "rgba(54, 162, 235, 0.5)",
+                "rgba(255, 206, 86, 0.5)",
+                "rgba(75, 192, 192, 0.5)",
+                "rgba(153, 102, 255, 0.5)",
+                "rgba(255, 159, 64, 0.5)",
+                "rgba(130, 206, 86, 0.5)",
+                "rgba(24, 192, 192, 0.5)",
+                "rgba(100, 102, 255, 0.5)",
+                "rgba(0, 159, 64, 0.5)",
+                "rgba(100, 102, 34, 0.5)",
+                "rgba(0, 245, 155, 0.5)"
             ],
             borderColor: [
                 "rgba(255,99,132,1)",
@@ -290,12 +329,17 @@ function graficoPolar ($names, $values, $id) {
                 "rgba(255, 206, 86, 1)",
                 "rgba(75, 192, 192, 1)",
                 "rgba(153, 102, 255, 1)",
-                "rgba(255, 159, 64, 1)"
+                "rgba(255, 159, 64, 1)",
+                "rgba(130, 206, 86, 1)",
+                "rgba(24, 192, 192, 1)",
+                "rgba(100, 102, 255, 1)",
+                "rgba(0, 159, 64, 1)",
+                "rgba(100, 102, 34, 1)",
+                "rgba(0, 245, 155, 1)"
             ],
             borderWidth: 1,
 	                  data: [';
 	                  foreach ($values as $value) {
-	                     //echo json_encode($value) . ',';
 	                     printf("%0.2f,",$value);
 	                  }
 	                  echo ']
@@ -311,7 +355,6 @@ function graficoPolar ($names, $values, $id) {
 					}	      	
 	      	
 	      	},
-      	
 	      	scale: {
 		                ticks: {
 		                    beginAtZero: true,

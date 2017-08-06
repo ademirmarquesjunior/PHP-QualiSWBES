@@ -39,35 +39,43 @@ include "conecta.php";
 					return $string;
 				} 
 				
-//----------Remover uma entrada da lista de objetivos x usuarios--------------------------------------------------------------//			
+				function mostrar_detalhes ($id) {
+					//Mostrar OntologiasFatoresSubfatores já inseridos
+					include "conecta.php";
+					$Sql = "SELECT * FROM `tbquestion` INNER JOIN tbartifacttext ON tbquestion.tbArtifact_idtbArtifact = tbartifacttext.tbArtifact_idtbArtifact INNER JOIN tbfactortext ON tbquestion.tbFactor_idtbFactor = tbfactortext.tbFactor_idtbFactor INNER JOIN tbsubfactortext ON tbquestion.tbSubFactor_idtbSubFactor = tbsubfactortext.tbSubFactor_idtbSubFactor WHERE tbartifacttext.tbLanguage_idtbLanguage = 1 AND tbfactortext.tbLanguage_idtbLanguage = 1 AND tbsubfactortext.tbLanguage_idtbLanguage = 1 AND tbquestion.tbQuestionId_idtbQuestionId = ".$id;
+					$rs = mysqli_query($conexao, $Sql);
+					while($row = mysqli_fetch_array($rs, MYSQLI_ASSOC)) {
+						echo $row['tbArtifactName']." - ".$row['tbFactorName']." - ".$row['tbSubFactorName']."<br>";
+					}					
+				}
+				
+//----------Remover uma entrada da lista de questões? x usuarios--------------------------------------------------------------//			
 				if (isset($_POST['submitRelationDel'])) {
-					$user = anti_injection($_POST['sel_user']);
-					$objective = anti_injection($_POST['sel_objective']);
+					$user = anti_injection($_POST['txt_user']);
 					$question = anti_injection($_POST['txt_question']);
 				
-					if (($user != "") AND ($objective != "")) {
-						$Sql = "DELETE FROM `tbobjectives_has_tbuserquestion` WHERE `tbObjectives_idtbObjectives` = ".$objective." AND `tbUserQuestion_idtbUserQuestion` = ".$question." AND `tbUserType_idtbUserType` = ".$user.";";
+					if ($user != "") {
+						$Sql = "DELETE FROM `tbusertype_has_tbuserquestion` WHERE `tbusertype_has_tbuserquestion`.`tbUserType_idtbUserType` = ".$user." AND `tbusertype_has_tbuserquestion`.`tbQuestionId_idtbQuestionId` = ".$question."";
 						$rs = mysqli_query($conexao, $Sql) or die ("Erro ao apagar");
 					}
 				}
 
-//----------Inserir ou editar uma entrada na lista de objetivos x Usuários----------------------------------------------------//
+//----------Inserir ou editar uma entrada na lista de questões? x Usuários----------------------------------------------------//
 				if (isset($_POST['submitRelationAdd'])) {
-					$user = anti_injection($_POST['sel_user']);
-					$objective = anti_injection($_POST['sel_objective']);
+					$user = anti_injection($_POST['txt_user']);
 					$weight = anti_injection($_POST['txt_weight']);
 					$question = anti_injection($_POST['txt_question']);
+					
+					if (!is_numeric($weight)) $weight = 1.00;
 				
-					if (($user != "") AND ($objective != "")) {
-						$Sql = "SELECT * FROM tbobjectives_has_tbuserquestion WHERE tbObjectives_idtbObjectives = ".$objective." AND tbUserQuestion_idtbUserQuestion = ".$question." AND tbUserType_idtbUserType = ".$user." ";
-						$rs = mysqli_query($conexao, $Sql) or die ("Erro");
-							
+					if ($user != "") {
+						$Sql = "SELECT * FROM tbusertype_has_tbuserquestion WHERE  tbQuestionId_idtbQuestionId = ".$question." AND tbUserType_idtbUserType = ".$user;						
+						$rs = mysqli_query($conexao, $Sql) or die ("Erro");											
 						if (mysqli_num_rows($rs) == 0) {
-							$Sql = "INSERT INTO `tbobjectives_has_tbuserquestion` (`idtbObjectives_has_tbUserQuestion`, `tbObjectives_idtbObjectives`, `tbUserQuestion_idtbUserQuestion`, `tbUserType_idtbUserType`, `tbObjectives_has_tbUserWeight`) VALUES (NULL, '".$objective."', '".$question."', '".$user."', '".$weight."')";
+							$Sql = "INSERT INTO `tbusertype_has_tbuserquestion` (`tbUserType_idtbUserType`, `tbUserType_has_tbUserQuestionWeight`, `tbQuestionId_idtbQuestionId`) VALUES ('".$user."', '".$weight."', '".$question."')";
 							$rs = mysqli_query($conexao, $Sql) or die ("Erro ao inserir");
 						} else {
-							if (!is_numeric($weight)) $weight = 1.00;
-							$Sql = "UPDATE `tbobjectives_has_tbuserquestion` SET `tbObjectives_has_tbUserWeight` = '".$weight."' WHERE `tbobjectives_has_tbuserquestion`.`tbObjectives_idtbObjectives` = ".$objective." AND `tbobjectives_has_tbuserquestion`.`tbUserQuestion_idtbUserQuestion` = ".$question." AND `tbobjectives_has_tbuserquestion`.`tbUserType_idtbUserType` = ".$user.";";
+							$Sql = "UPDATE `tbusertype_has_tbuserquestion` SET `tbUserType_has_tbUserQuestionWeight` = '".$weight."' WHERE  `tbusertype_has_tbuserquestion`.`tbUserType_idtbUserType` = ".$user." AND `tbusertype_has_tbuserquestion`.`tbQuestionId_idtbQuestionId` = ".$question;
 							$rs = mysqli_query($conexao, $Sql) or die ("Erro ao editar");
 						}
 					}
@@ -88,7 +96,7 @@ include "conecta.php";
 			<div class='panel-heading'><h1>Gerenciamento de questões</h1></div>
 			<div class='panel-body'>
 			<p>
-			<a href="inserequestao.php"><img src="img/images.png" height="30" alt="Adicionar nova" />Inserir nova</a>
+			<a href="questioneditor.php"><img src="img/images.png" height="30" alt="Adicionar nova" />Inserir nova</a>
 			</p>
 			
 			<form id="form2" name="form2" method="post" action="questionmanager.php" class="form-inline">
@@ -121,76 +129,46 @@ include "conecta.php";
 			<?php
 
 			
-			$Sql = "SELECT DISTINCT idtbUserQuestion, tbuserquestion.tbArtifact_idtbArtifact, tbArtifactName, tbfactortext.tbFactorName, tbSubFactorName,  tbQuestionText,  tbQuestionTextHowTo,  tbquestiontext.tbLanguage_idtbLanguage FROM  tbuserquestion INNER JOIN  tbquestiontext ON tbuserquestion.idtbUserQuestion = tbquestiontext.tbUserQuestion_idtbUserQuestion INNER JOIN  tbobjectives_has_tbuserquestion ON tbuserquestion.idtbUserQuestion = tbobjectives_has_tbuserquestion.tbUserQuestion_idtbUserQuestion INNER JOIN tbartifacttext ON tbuserquestion.tbartifact_idtbArtifact = tbartifacttext.tbArtifact_idtbArtifact INNER JOIN tbfactortext ON tbuserquestion.tbFactor_idtbFactor = tbfactortext.tbFactor_idtbFactor INNER JOIN tbsubfactortext ON tbuserquestion.tbSubFactor_idtbSubFactor = tbsubfactortext.tbSubFactor_idtbSubFactor WHERE tbquestiontext.tbLanguage_idtbLanguage = 1 AND tbartifacttext.tbLanguage_idtbLanguage = 1 AND tbfactortext.tbLanguage_idtbLanguage = 1 AND tbsubfactortext.tbLanguage_idtbLanguage = 1 ". $list." ORDER BY tbartifacttext.tbArtifactName, tbfactortext.tbFactorName, tbsubfactortext.tbSubFactorName";
+			$Sql = "SELECT DISTINCT idtbQuestionId, tbQuestionText, tbQuestionTextHowTo, tbquestiontext.tbLanguage_idtbLanguage FROM tbquestionid INNER JOIN tbquestiontext ON tbquestionid.idtbQuestionId = tbquestiontext.tbQuestionId_idtbQuestionId WHERE tbquestiontext.tbLanguage_idtbLanguage = 1 ";
+			//echo $Sql;
 			$rs = mysqli_query($conexao, $Sql) or die ("Erro na pesquisa");
 			if (mysqli_num_rows($rs) == 0) {
 				$_SESSION['artifact'] = '';
 				$_SESSION['factor'] = '';
-				echo  "<script type='text/javascript'> window.location.assign('questionmanager.php'); </script>";
+				echo  "<a href='questionmanager.php'>Atualizar</a>";
 			}
 			
 				while($row = mysqli_fetch_array($rs, MYSQLI_ASSOC)) {
-					$id=$row["idtbUserQuestion"];
+					$id=$row["idtbQuestionId"];
 					echo  '<tr>
 								<td>'.$id.'</td>';
 					
-					echo "<td>".$row['tbArtifactName']." , ".$row['tbFactorName']." , ".$row['tbSubFactorName']."<br><strong>".$row['tbQuestionText']."</strong><br><a href='editaquestao.php?id=".$id."'>Editar texto</a></td>";
+					echo "<td><strong>";
+					echo $row['tbQuestionText']."</strong><br>";
+					mostrar_detalhes($id);
+					echo "<a href='questioneditor.php?id=".$id."'>Editar texto</a></td>";
 					
-					echo '<td>
-								<form method="post" action="questionmanager.php" class="form form-inline">';
-									$Sql2 = "SELECT * FROM tbusertype INNER JOIN tbusertypetext ON tbusertype.idtbUserType = tbusertypetext.tbUserType_idtbUserType WHERE tbusertypetext.tbLanguage_idtbLanguage = 1";
-									echo '<select name="sel_user" id="user" class="form-control" style="width: 35%">';
-									echo '<option value="">Avaliador</option>';
-									$rs2 = mysqli_query($conexao, $Sql2) or die ("Erro na pesquisa");
-									while ($row2 =  mysqli_fetch_array($rs2, MYSQLI_ASSOC)){ 
-										echo "<option value=" . $row2['idtbUserType'] . ">" . $row2['tbUserTypeDesc'] . "</option>";
-									}
-									echo '</select>';
-					
-									echo '<input name="txt_question" value="'.$id.'" size="12" type="text" hidden/>';
-					
-									$Sql2 = "SELECT * FROM tbobjectives INNER JOIN tbobjectivestext ON tbobjectives.idtbObjectives = tbobjectivestext.tbObjectives_idtbObjectives WHERE tbobjectivestext.tbLanguage_idtbLanguage = 1";
-									echo '<select name="sel_objective" id="objective" class="form-control" style="width: 35%">
-										<option value="">Objetivo</option>';
-										$rs2 = mysqli_query($conexao, $Sql2) or die ("Erro na pesquisa");
-										while ($row2 =  mysqli_fetch_array($rs2, MYSQLI_ASSOC)){ 
-											echo "<option value=".$row2['idtbObjectives'].">".$row2['tbObjectivesDesc']."</option>";
-										}
-									echo '</select>';
-					
-									echo '<input name="txt_weight" value="1.00" size="1" type="text" class="form-control"/>
-									<button type="submit" name="submitRelationDel" class="btn btn-danger"><span class="glyphicon glyphicon-minus-sign"></span></button>
-									<button type="submit" name="submitRelationAdd" class="btn btn-primary"><span class="glyphicon glyphicon-plus-sign"></span></button>
-								</form>';
+					echo '<td>';
 					
 					echo '<small>
-							<table class="table table-condensed table-bordered">
-							<tr><td></td>';
-							
-					$Sql2 = "SELECT * FROM tbobjectives INNER JOIN tbobjectivestext ON tbobjectives.idtbobjectives = tbobjectivestext.tbobjectives_idtbobjectives WHERE tbobjectivestext.tbLanguage_idtbLanguage = 1";
-					$rs2 = mysqli_query($conexao, $Sql2) or die ("Erro na pesquisa");
-					$objectives = mysqli_num_rows($rs2);
-					while ($row2 =  mysqli_fetch_array($rs2, MYSQLI_ASSOC)){
-						echo "<td>".$row2['tbObjectivesDesc']."</td>";
-					}
-					echo "</tr>";
-					
+							<table class="table table-condensed table-bordered" style="width:400px">';					
 					
 					$Sql2 = "SELECT * FROM tbusertype INNER JOIN tbusertypetext ON tbusertype.idtbUserType = tbusertypetext.tbUserType_idtbUserType WHERE tbusertypetext.tbLanguage_idtbLanguage = 1";
 					$rs2 = mysqli_query($conexao, $Sql2) or die ("Erro na pesquisa");
 					while ($row2 =  mysqli_fetch_array($rs2, MYSQLI_ASSOC)){ 
 						echo "<tr><td>".$row2['tbUserTypeDesc']. ":</td> ";
-						
-						for($i=1;$i<$objectives+1;$i++) {
-							echo "<td>";
-							$Sql3 = "SELECT * FROM tbobjectives_has_tbuserquestion WHERE tbobjectives_has_tbuserquestion.tbUserType_idtbUserType = ".$row2['idtbUserType']." AND tbobjectives_has_tbuserquestion.tbUserQuestion_idtbUserQuestion = ".$id." AND tbobjectives_has_tbuserquestion.tbobjectives_idtbobjectives = ".$i;
-							//echo $Sql3;
-							$rs3 = mysqli_query($conexao, $Sql3) or die ("Erro na pesquisa");
-							$row3 =  mysqli_fetch_array($rs3, MYSQLI_ASSOC);
-								//echo $row3['tbObjectivesDesc']."(".$row3['tbObjectives_has_tbUserWeight'].");";
-							echo $row3['tbObjectives_has_tbUserWeight'];
-							echo "</td>";
-						}
+						echo "<td>";
+						$Sql3 = "SELECT * FROM tbusertype_has_tbuserquestion WHERE tbusertype_has_tbuserquestion.tbUserType_idtbUserType = ".$row2['idtbUserType']." AND tbusertype_has_tbuserquestion.tbQuestionId_idtbQuestionId = ".$id;
+						$rs3 = mysqli_query($conexao, $Sql3) or die ("Erro na pesquisa");
+						$row3 =  mysqli_fetch_array($rs3, MYSQLI_ASSOC);
+						//echo $row3['tbObjectives_has_tbUserWeight'];
+						echo '<form method="post" action="questionmanager.php" class="form form-inline">
+									<input name="txt_question" value="'.$id.'" size="12" type="text" hidden/>
+									<input name="txt_user" value="'.$row2['idtbUserType'].'" size="12" type="text" hidden/>
+									<input name="txt_weight" value="'.$row3['tbUserType_has_tbUserQuestionWeight'].'" size="1" type="text" />
+									<button type="submit" name="submitRelationDel" class="btn btn-danger btn-xs"><span class="glyphicon glyphicon-minus-sign"></span></button>
+									<button type="submit" name="submitRelationAdd" class="btn btn-primary btn-xs"><span class="glyphicon glyphicon-plus-sign"></span></button>
+								</form>';
 						echo "</tr>";
 					}
 					echo '</table></small>';			
