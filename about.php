@@ -22,14 +22,25 @@
 	include 'navbar.php';
 ?>
 		<div class="panel panel-default">
-			<div class='panel-heading'><h1><?php echo $lang['MENU_INTRODUCTION'] ?></h1></div>
+			<div class='panel-heading'><h1><?php echo $lang['ABOUT_TITLE'] ?></h1></div>
 			<div class="panel-body">
+				<div class="col-md-2">
+						<a href="http://www.icmc.usp.br/" target="_blank"><img src="img/icmc.png" width="198" height="101" alt="ICMC-USP"></a>
+					</div>
+				<div class="row">
+					<div class="col-md-2">
+						<a href="http://caed-lab.com/" target="_blank"><img src="img/caed.png" width="198" height="101" alt="Caed"></a>
+					</div>
+				</div>
 				<div class="row">
 					<div class="col-md-8">
-						<?php echo $lang['INDEX_TEXT']; ?>
+						<img src="img/logo.png" width="70%" alt="" align="center">
 					</div>
-					<div class="col-md-4">
-						<img src="img/overview.jpg" width="100%" alt="" align="right">
+				</div>
+				
+				<div class="row">
+					<div class="col-md-8">
+						<?php echo $lang['ABOUT_TEXT']; ?>
 					</div>
 				</div>
 			</div>
