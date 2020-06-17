@@ -14,16 +14,20 @@ Joint work of:
 Thesis Link:
 https://teses.usp.br/teses/disponiveis/55/55134/tde-01022018-084626/pt-br.php
 
-# Requirements
+## Installation
 
-PHP web development environment with support to MySQL/MariaDB database management.
-
-PHP 5.6/7.0 family is recommended.
-
-# Installation
+For proper installation consider a PHP web development environment with support to MySQL/MariaDB database management as main requirements. PHP 5.6/7.0 family is recommended.
 
 Clone/Copy this repository to your web server environment folder and import the Sql script "caede741_cida.sql" into your database manager. Changes in conecta.php are necessary to reflect the database settings used.
 
-# Usage
+## Usage
 
 Plese consult the published [thesis](https://teses.usp.br/teses/disponiveis/55/55134/tde-01022018-084626/pt-br.php) and [this](https://github.com/ademirmarquesjunior/PHP-QualiSWBES/blob/master/Docs/QualiSWBES_MEMORIAL%20DESCRITIVO_v5.pdf) document present in "Docs" folder.
+
+## Credits
+
+This work is credited to [Ademir Marques Junior](https://www.researchgate.net/profile/Ademir_Junior), [Aparecida Maria Zem Lopes](https://www.researchgate.net/profile/Aparecida_Zem-Lopes), and [Seiji Isotani](https://www.researchgate.net/profile/Seiji_Isotani).
+
+## License
+
+    MIT Licence (https://mit-license.org/)
